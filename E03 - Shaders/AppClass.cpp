@@ -113,6 +113,13 @@ void AppClass::ProcessKeyboard(sf::Event a_event)
 		m_v3Color = glm::vec3(0.0f, 1.0f, 0.0f);
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3))
 		m_v3Color = glm::vec3(0.0f, 0.0f, 1.0f);
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) //new check for complementary color flip
+	{
+		if (complementaryEnabled)
+			complementaryEnabled = false;
+		else
+			complementaryEnabled = true;
+	}
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num0))
 		m_v3Color = glm::vec3(-1.0f, -1.0f, -1.0f);
 }
@@ -124,6 +131,9 @@ void AppClass::Display(void)
 	//read uniforms and send values
 	GLuint SolidColor = glGetUniformLocation(m_uShaderProgramID, "SolidColor");
 	glUniform3f(SolidColor, m_v3Color.r, m_v3Color.g, m_v3Color.b);
+	GLboolean ComplimentaryEnabled = glGetUniformLocation(m_uShaderProgramID, "ComplimentaryEnabled");
+	glUniform1f(ComplimentaryEnabled, complementaryEnabled);
+	
 
 	//draw content
 	glDrawArrays(GL_TRIANGLES, 0, 3);
