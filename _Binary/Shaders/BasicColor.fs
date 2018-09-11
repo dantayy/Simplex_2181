@@ -11,7 +11,7 @@ void main()
 	Fragment = vec4(Color,1);
 	
 	if(SolidColor.r != -1.0 && SolidColor.g != -1.0 && SolidColor.b != -1.0)
-		Fragment = vec4(SolidColor, 1);
+		Fragment = vec4(1 - SolidColor.r, 1 - SolidColor.g, 1 - SolidColor.b, 1);
 
 	return;
 }
