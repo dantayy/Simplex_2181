@@ -20,6 +20,8 @@ class MyMesh
 
 	ShaderManager* m_pShaderMngr = nullptr;	//Shader Manager
 
+	vector3 * points; //array for points used to draw a circle
+
 public:
 	/*
 	USAGE: Initialize the object's fields

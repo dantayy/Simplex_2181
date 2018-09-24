@@ -13,7 +13,7 @@ void MyMesh::GenerateCircle(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		a_nSubdivisions = 360;
 
 	//create an array of vec3's for point storage
-	vector3 * points = new vector3[a_nSubdivisions];
+	points = new vector3[a_nSubdivisions];
 	//calculate the positions
 	for (size_t i = 0; i < a_nSubdivisions; i++)
 	{
@@ -53,6 +53,8 @@ void MyMesh::Release(void)
 	m_lVertex.clear();
 	m_lVertexPos.clear();
 	m_lVertexCol.clear();
+
+	delete[] points; //clear memory allocated by the circle generation
 }
 MyMesh::MyMesh()
 {
