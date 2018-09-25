@@ -35,8 +35,12 @@ class MyMesh
 	ShaderManager* m_pShaderMngr = nullptr;	//Shader Manager
 
 	vector3 * conePoints; //array for points used to draw a cone
-	vector3 * cylinderPoints; //array for points used to draw a cylinder
-	vector3 * tubePoints; //array for points used to draw a tube
+	vector3 * cylinderBasePoints; //array for points used to draw a cylinder
+	vector3 * cylinderTopPoints; //array for points used to draw a cylinder
+	vector3 * innerTubeBasePoints; //array for points used to draw a tube
+	vector3 * innerTubeTopPoints; //array for points used to draw a tube
+	vector3 * outerTubeBasePoints; //array for points used to draw a tube
+	vector3 * outerTubeTopPoints; //array for points used to draw a tube
 	vector3 * spherePoints; //array for points used to draw a sphere
 
 

@@ -275,8 +275,6 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	// Replace this with your code
-	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
 	//create an array of vec3's for base point storage
 	conePoints = new vector3[a_nSubdivisions];
 	//calculate the positions for the base
@@ -298,7 +296,6 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	}
 	//add the last tri for the side of the cone
 	AddTri({ 0,a_fHeight,0 }, conePoints[a_nSubdivisions - 1], conePoints[0]);
-	// -------------------------------
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -320,9 +317,29 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	//create an array of vec3's for base point storage
+	cylinderBasePoints = new vector3[a_nSubdivisions];
+	//create an array of vec3's for top point storage
+	cylinderTopPoints = new vector3[a_nSubdivisions];
+	//calculate the positions for the base and top
+	for (size_t i = 0; i < a_nSubdivisions; i++)
+	{
+		cylinderBasePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		cylinderTopPoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+	}
+	//add all the tris and quads for the base, top, and what connects them (except for the last ones)
+	for (size_t i = 1; i < a_nSubdivisions; i++)
+	{
+		AddTri({ 0,0,0 }, cylinderBasePoints[i - 1], cylinderBasePoints[i]);
+		AddTri({ 0,a_fHeight,0 }, cylinderTopPoints[i], cylinderTopPoints[i - 1]);
+		AddQuad(cylinderBasePoints[i - 1], cylinderBasePoints[i], cylinderTopPoints[i - 1], cylinderTopPoints[i]);
+	}
+	//add the last tri for the base
+	AddTri({ 0,0,0 }, cylinderBasePoints[a_nSubdivisions - 1], cylinderBasePoints[0]);
+	//add the last tri for the top
+	AddTri({ 0,a_fHeight,0 }, cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
+	//add the last quad
+	AddQuad(cylinderBasePoints[a_nSubdivisions - 1], cylinderBasePoints[0], cylinderTopPoints[a_nSubdivisions - 1], cylinderTopPoints[0]);
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -350,10 +367,37 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	//create an array of vec3's for inner base point storage
+	innerTubeBasePoints = new vector3[a_nSubdivisions];
+	//create an array of vec3's for inner top point storage
+	innerTubeTopPoints = new vector3[a_nSubdivisions];
+	//create an array of vec3's for outer base point storage
+	outerTubeBasePoints = new vector3[a_nSubdivisions];
+	//create an array of vec3's for outer top point storage
+	outerTubeTopPoints = new vector3[a_nSubdivisions];
 
+	//calculate the positions for the inner and outer bases and tops
+	for (size_t i = 0; i < a_nSubdivisions; i++)
+	{
+		innerTubeBasePoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		innerTubeTopPoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		outerTubeBasePoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		outerTubeTopPoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+	}
+	//add all the quads for the tube (except for the last ones)
+	for (size_t i = 1; i < a_nSubdivisions; i++)
+	{
+		AddQuad(outerTubeBasePoints[i - 1], outerTubeBasePoints[i], innerTubeBasePoints[i - 1], innerTubeBasePoints[i]);
+		AddQuad(innerTubeTopPoints[i - 1], innerTubeTopPoints[i], outerTubeTopPoints[i - 1], outerTubeTopPoints[i]);
+		AddQuad(outerTubeTopPoints[i - 1], outerTubeTopPoints[i], outerTubeBasePoints[i - 1], outerTubeBasePoints[i]);
+		AddQuad(innerTubeBasePoints[i - 1], innerTubeBasePoints[i], innerTubeTopPoints[i - 1], innerTubeTopPoints[i]);
+	}
+	//add the last quads
+	AddQuad(outerTubeBasePoints[a_nSubdivisions - 1], outerTubeBasePoints[0], innerTubeBasePoints[a_nSubdivisions - 1], innerTubeBasePoints[0]);
+	AddQuad(innerTubeTopPoints[a_nSubdivisions - 1], innerTubeTopPoints[0], outerTubeTopPoints[a_nSubdivisions - 1], outerTubeTopPoints[0]);
+	AddQuad(outerTubeTopPoints[a_nSubdivisions - 1], outerTubeTopPoints[0], outerTubeBasePoints[a_nSubdivisions - 1], outerTubeBasePoints[0]);
+	AddQuad(innerTubeBasePoints[a_nSubdivisions - 1], innerTubeBasePoints[0], innerTubeTopPoints[a_nSubdivisions - 1], innerTubeTopPoints[0]);
+	
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
@@ -396,7 +440,7 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		a_fRadius = 0.01f;
 
 	//Sets minimum and maximum of subdivisions
-	if (a_nSubdivisions < 1)
+	if (a_nSubdivisions < 3)
 	{
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
