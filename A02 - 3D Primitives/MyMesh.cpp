@@ -276,7 +276,28 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//create an array of vec3's for base point storage
+	conePoints = new vector3[a_nSubdivisions];
+	//calculate the positions for the base
+	for (size_t i = 0; i < a_nSubdivisions; i++)
+	{
+		conePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+	}
+	//add all the tris for the base (except for the last one)
+	for (size_t i = 1; i < a_nSubdivisions; i++)
+	{
+		AddTri({ 0,0,0 }, conePoints[i - 1], conePoints[i]);
+	}
+	//add the last tri for the base
+	AddTri({ 0,0,0 }, conePoints[a_nSubdivisions - 1], conePoints[0]);
+	//add tris from the base circle to the top of the cone (except for the last one)
+	for (size_t i = 1; i < a_nSubdivisions; i++)
+	{
+		AddTri({ 0,a_fHeight,0 }, conePoints[i - 1], conePoints[i]);
+	}
+	//add the last tri for the side of the cone
+	AddTri({ 0,a_fHeight,0 }, conePoints[a_nSubdivisions - 1], conePoints[0]);
 	// -------------------------------
 
 	// Adding information about color
