@@ -3,6 +3,9 @@
 
 int main(void)
 {
+	//Check for memroy leaks
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
 	Application* pApp = new Application();
 	pApp->Init("", RES_C_1280x720_16x9_HD, false, false);
 	pApp->Run();

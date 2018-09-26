@@ -22,6 +22,7 @@ void MyMesh::Release(void)
 	m_lVertex.clear();
 	m_lVertexPos.clear();
 	m_lVertexCol.clear();
+
 }
 MyMesh::MyMesh()
 {
@@ -292,6 +293,7 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	//add tris from the base circle to the top of the cone (except for the last one)
 	for (size_t i = 1; i < a_nSubdivisions; i++)
 	{
+		//make sure all faces are drawn outwards, flipping the vertex order when needed
 		if (i / (2 * PI) > PI)
 			AddTri({ 0,a_fHeight/2,0 }, conePoints[i - 1], conePoints[i]);
 		else
@@ -299,6 +301,9 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	}
 	//add the last tri for the side of the cone
 	AddTri({ 0,a_fHeight/2,0 }, conePoints[0], conePoints[a_nSubdivisions - 1]);
+
+	//deallocate memory on the heap
+	delete[] conePoints;
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -335,6 +340,7 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	{
 		AddTri({ 0,-a_fHeight / 2,0 }, cylinderBasePoints[i - 1], cylinderBasePoints[i]);
 		AddTri({ 0,a_fHeight / 2,0 }, cylinderTopPoints[i], cylinderTopPoints[i - 1]);
+		//make sure all faces are drawn outwards, flipping the vertex order when needed
 		if(i/(2*PI) > PI)
 			AddQuad(cylinderBasePoints[i - 1], cylinderBasePoints[i], cylinderTopPoints[i - 1], cylinderTopPoints[i]);
 		else
@@ -346,6 +352,10 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	AddTri({ 0,a_fHeight / 2,0 }, cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
 	//add the last quad
 	AddQuad(cylinderBasePoints[0], cylinderBasePoints[a_nSubdivisions - 1], cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
+
+	//deallocate memory on the heap
+	delete[] cylinderBasePoints;
+	delete[] cylinderTopPoints;
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -404,6 +414,12 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	AddQuad(outerTubeTopPoints[a_nSubdivisions - 1], outerTubeTopPoints[0], outerTubeBasePoints[a_nSubdivisions - 1], outerTubeBasePoints[0]);
 	AddQuad(innerTubeBasePoints[a_nSubdivisions - 1], innerTubeBasePoints[0], innerTubeTopPoints[a_nSubdivisions - 1], innerTubeTopPoints[0]);
 	
+	//deallocate memory on the heap
+	delete[] outerTubeBasePoints;
+	delete[] innerTubeBasePoints;
+	delete[] outerTubeTopPoints;
+	delete[] innerTubeTopPoints;
+
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
@@ -451,57 +467,61 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
 	}
-	if (a_nSubdivisions > 6)
-		a_nSubdivisions = 6;
+	if (a_nSubdivisions > 360)
+		a_nSubdivisions = 360;
 
 	Release();
 	Init();
-	//???How do???? Map????
+
+	//create an array of vec3's for lower sphere ring point storage
 	lowerSpherePoints = new vector3[a_nSubdivisions];
+	//create an array of vec3's for middle sphere ring point storage
 	middleSpherePoints = new vector3[a_nSubdivisions];
+	//create an array of vec3's for upper sphere ring point storage
 	upperSpherePoints = new vector3[a_nSubdivisions];
+
+	//calculate positions for the three main rings of the sphere (using # of subdivisions to determine how well defined each ring is)
 	for (size_t i = 0; i < a_nSubdivisions; i++)
 	{
-		lowerSpherePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		middleSpherePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		lowerSpherePoints[i] = { a_fRadius * (sqrt(2)/2) * cos(((2 * PI) / a_nSubdivisions) * i), -a_fRadius / 2, a_fRadius / 2 * sin(((2 * PI) / a_nSubdivisions) * i) };
+		middleSpherePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		upperSpherePoints[i] = { a_fRadius * (sqrt(2) / 2) * cos(((2 * PI) / a_nSubdivisions) * i), a_fRadius / 2, a_fRadius / 2 * sin(((2 * PI) / a_nSubdivisions) * i) };
 	}
-	////make a new variable using the given number of subdivisions for the number of vec3's needed for the sphere
-	//int numPoints = (a_nSubdivisions - 2) * 12 + 2;
-	//spherePoints = new vector3[numPoints];
-	////variable for number of subdivisions with a unique radius
-	//int numUniqueSubdivisions = (a_nSubdivisions - 2) / 2;
-	//subdivisionRadii = new float[numUniqueSubdivisions];
-	////get the radii for the subdivisions
-	//for (size_t i = 0; i < numUniqueSubdivisions; i++)
-	//{
-	//	subdivisionRadii[i] = a_fRadius * ((i + 1) / numUniqueSubdivisions);
-	//}
-	////make the first point of the sphere (the bottom)
-	//spherePoints[0] = { 0,0,0 };
-	////counter for determining which radius to use
-	//int radiusCounter = 0;
-	////counter for determining the proper height for the subdivision points
-	//int heightCounter = 1;
-	////add the rest of the points for the sphere (except the top)
-	//for (size_t i = 1; i < numPoints - 1; i++)
-	//{
-	//	spherePoints[i] = { subdivisionRadii[radiusCounter] * cos(((2 * PI) / 12) * i), heightCounter / (a_fRadius * 2), subdivisionRadii[radiusCounter] * sin(((2 * PI) / 12) * i) };
-	//	if (radiusCounter < numUniqueSubdivisions)
-	//		radiusCounter++;
-	//	else
-	//		radiusCounter--;
-	//	heightCounter++;
-	//}
-	////make the last point of the sphere
-	//spherePoints[numPoints - 1] = { 0, a_fRadius * 2, 0 };
+	//add all the tris and quads for the sphere
+	for (size_t i = 1; i < a_nSubdivisions; i++)
+	{
+		//connecting bottom point of sphere to lower ring
+		AddTri({ 0,-a_fRadius,0 }, lowerSpherePoints[i - 1], lowerSpherePoints[i]);
+		//connecting top point of sphere to upper ring
+		AddTri({ 0,a_fRadius,0 }, upperSpherePoints[i], upperSpherePoints[i - 1]);
+		//make sure all faces are drawn outwards, flipping the vertex order when needed
+		if (i / (2 * PI) > PI)
+		{
+			//connecting lower ring to middle ring
+			AddQuad(lowerSpherePoints[i - 1], lowerSpherePoints[i], middleSpherePoints[i - 1], middleSpherePoints[i]);
+			//connecting middle ring to upper ring
+			AddQuad(middleSpherePoints[i - 1], middleSpherePoints[i], upperSpherePoints[i - 1], upperSpherePoints[i]);
+		}
+		else
+		{
+			//connecting lower ring to middle ring
+			AddQuad(lowerSpherePoints[i], lowerSpherePoints[i - 1], middleSpherePoints[i], middleSpherePoints[i - 1]);
+			//connecting middle ring to upper ring
+			AddQuad(middleSpherePoints[i], middleSpherePoints[i - 1], upperSpherePoints[i], upperSpherePoints[i - 1]);
+		}
+	}
+	//add the last tri for the bottom
+	AddTri({ 0,-a_fRadius,0 }, lowerSpherePoints[a_nSubdivisions - 1], lowerSpherePoints[0]);
+	//add the last tri for the top
+	AddTri({ 0,a_fRadius,0 }, upperSpherePoints[0], upperSpherePoints[a_nSubdivisions - 1]);
+	//add the last quads
+	AddQuad(lowerSpherePoints[0], lowerSpherePoints[a_nSubdivisions - 1], middleSpherePoints[0], middleSpherePoints[a_nSubdivisions - 1]);
+	AddQuad(middleSpherePoints[0], middleSpherePoints[a_nSubdivisions - 1], upperSpherePoints[0], upperSpherePoints[a_nSubdivisions - 1]);
 
-	////add the tris for the base and the top of the sphere
-	//for (size_t i = 2; i < 13; i++)
-	//{
-	//	AddTri(spherePoints[0], spherePoints[i - 1], spherePoints[i]);
-	//}
-	////add the last tri for the side of the cone
-	//AddTri(spherePoints[0], spherePoints[12], spherePoints[1]);
+	//deallocate memory on the heap
+	delete[] lowerSpherePoints;
+	delete[] middleSpherePoints;
+	delete[] upperSpherePoints;
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
