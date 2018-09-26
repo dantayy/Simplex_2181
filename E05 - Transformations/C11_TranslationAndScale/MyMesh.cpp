@@ -105,7 +105,7 @@ void MyMesh::CompileOpenGL3X(void)
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBO);//Bind the VBO
 	glBufferData(GL_ARRAY_BUFFER, m_uVertexCount * 2 * sizeof(vector3), &m_lVertex[0], GL_STATIC_DRAW);//Generate space for the VBO
 
-	// Position attribute
+																									   // Position attribute
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 2 * sizeof(vector3), (GLvoid*)0);
 
@@ -121,7 +121,7 @@ void MyMesh::Render(matrix4 a_mProjection, matrix4 a_mView, matrix4 a_mModel)
 {
 	// Use the buffer and shader
 	GLuint nShader = m_pShaderMngr->GetShaderID("Basic");
-	glUseProgram(nShader); 
+	glUseProgram(nShader);
 
 	//Bind the VAO of this object
 	glBindVertexArray(m_VAO);
@@ -133,11 +133,11 @@ void MyMesh::Render(matrix4 a_mProjection, matrix4 a_mView, matrix4 a_mModel)
 	//Final Projection of the Camera
 	matrix4 m4MVP = a_mProjection * a_mView * a_mModel;
 	glUniformMatrix4fv(MVP, 1, GL_FALSE, glm::value_ptr(m4MVP));
-	
+
 	//Solid
 	glUniform3f(wire, -1.0f, -1.0f, -1.0f);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glDrawArrays(GL_TRIANGLES, 0, m_uVertexCount);  
+	glDrawArrays(GL_TRIANGLES, 0, m_uVertexCount);
 
 	//Wire
 	glUniform3f(wire, 1.0f, 0.0f, 1.0f);
@@ -153,8 +153,8 @@ void MyMesh::AddTri(vector3 a_vBottomLeft, vector3 a_vBottomRight, vector3 a_vTo
 {
 	//C
 	//| \
-	//A--B
-	//This will make the triangle A->B->C 
+		//A--B
+//This will make the triangle A->B->C 
 	AddVertexPosition(a_vBottomLeft);
 	AddVertexPosition(a_vBottomRight);
 	AddVertexPosition(a_vTopLeft);
@@ -186,17 +186,17 @@ void MyMesh::GenerateCube(float a_fSize, vector3 a_v3Color)
 	//|  |
 	//0--1
 
-	vector3 point0(-fValue,-fValue, fValue); //0
-	vector3 point1( fValue,-fValue, fValue); //1
-	vector3 point2( fValue, fValue, fValue); //2
+	vector3 point0(-fValue, -fValue, fValue); //0
+	vector3 point1(fValue, -fValue, fValue); //1
+	vector3 point2(fValue, fValue, fValue); //2
 	vector3 point3(-fValue, fValue, fValue); //3
 
-	vector3 point4(-fValue,-fValue,-fValue); //4
-	vector3 point5( fValue,-fValue,-fValue); //5
-	vector3 point6( fValue, fValue,-fValue); //6
-	vector3 point7(-fValue, fValue,-fValue); //7
+	vector3 point4(-fValue, -fValue, -fValue); //4
+	vector3 point5(fValue, -fValue, -fValue); //5
+	vector3 point6(fValue, fValue, -fValue); //6
+	vector3 point7(-fValue, fValue, -fValue); //7
 
-	//F
+											  //F
 	AddQuad(point0, point1, point3, point2);
 
 	//B
@@ -237,7 +237,7 @@ void MyMesh::GenerateCuboid(vector3 a_v3Dimensions, vector3 a_v3Color)
 	vector3 point6(v3Value.x, v3Value.y, -v3Value.z); //6
 	vector3 point7(-v3Value.x, v3Value.y, -v3Value.z); //7
 
-	//F
+													   //F
 	AddQuad(point0, point1, point3, point2);
 
 	//B
@@ -275,30 +275,13 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Release();
 	Init();
 
-	//create an array of vec3's for base point storage
-	conePoints = new vector3[a_nSubdivisions];
-	//calculate the positions for the base
-	for (size_t i = 0; i < a_nSubdivisions; i++)
-	{
-		conePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight/2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-	}
-	//add all the tris for the base (except for the last one)
-	for (size_t i = 1; i < a_nSubdivisions; i++)
-	{
-		AddTri({ 0,-a_fHeight / 2,0 }, conePoints[i - 1], conePoints[i]);
-	}
-	//add the last tri for the base
-	AddTri({ 0,-a_fHeight/2,0 }, conePoints[a_nSubdivisions - 1], conePoints[0]);
-	//add tris from the base circle to the top of the cone (except for the last one)
-	for (size_t i = 1; i < a_nSubdivisions; i++)
-	{
-		if (i / (2 * PI) > PI)
-			AddTri({ 0,a_fHeight/2,0 }, conePoints[i - 1], conePoints[i]);
-		else
-			AddTri({ 0,a_fHeight/2,0 }, conePoints[i], conePoints[i - 1]);
-	}
-	//add the last tri for the side of the cone
-	AddTri({ 0,a_fHeight/2,0 }, conePoints[0], conePoints[a_nSubdivisions - 1]);
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateCone(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -320,32 +303,13 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Release();
 	Init();
 
-	//create an array of vec3's for base point storage
-	cylinderBasePoints = new vector3[a_nSubdivisions];
-	//create an array of vec3's for top point storage
-	cylinderTopPoints = new vector3[a_nSubdivisions];
-	//calculate the positions for the base and top
-	for (size_t i = 0; i < a_nSubdivisions; i++)
-	{
-		cylinderBasePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		cylinderTopPoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-	}
-	//add all the tris and quads for the base, top, and what connects them (except for the last ones)
-	for (size_t i = 1; i < a_nSubdivisions; i++)
-	{
-		AddTri({ 0,-a_fHeight / 2,0 }, cylinderBasePoints[i - 1], cylinderBasePoints[i]);
-		AddTri({ 0,a_fHeight / 2,0 }, cylinderTopPoints[i], cylinderTopPoints[i - 1]);
-		if(i/(2*PI) > PI)
-			AddQuad(cylinderBasePoints[i - 1], cylinderBasePoints[i], cylinderTopPoints[i - 1], cylinderTopPoints[i]);
-		else
-			AddQuad(cylinderBasePoints[i], cylinderBasePoints[i - 1], cylinderTopPoints[i], cylinderTopPoints[i - 1]);
-	}
-	//add the last tri for the base
-	AddTri({ 0,-a_fHeight / 2,0 }, cylinderBasePoints[a_nSubdivisions - 1], cylinderBasePoints[0]);
-	//add the last tri for the top
-	AddTri({ 0,a_fHeight / 2,0 }, cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
-	//add the last quad
-	AddQuad(cylinderBasePoints[0], cylinderBasePoints[a_nSubdivisions - 1], cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateCylinder(a_fRadius, a_fHeight, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -373,37 +337,14 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Release();
 	Init();
 
-	//create an array of vec3's for inner base point storage
-	innerTubeBasePoints = new vector3[a_nSubdivisions];
-	//create an array of vec3's for inner top point storage
-	innerTubeTopPoints = new vector3[a_nSubdivisions];
-	//create an array of vec3's for outer base point storage
-	outerTubeBasePoints = new vector3[a_nSubdivisions];
-	//create an array of vec3's for outer top point storage
-	outerTubeTopPoints = new vector3[a_nSubdivisions];
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateTube(a_fOuterRadius, a_fInnerRadius, a_fHeight, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
-	//calculate the positions for the inner and outer bases and tops
-	for (size_t i = 0; i < a_nSubdivisions; i++)
-	{
-		innerTubeBasePoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		innerTubeTopPoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		outerTubeBasePoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		outerTubeTopPoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-	}
-	//add all the quads for the tube (except for the last ones)
-	for (size_t i = 1; i < a_nSubdivisions; i++)
-	{
-		AddQuad(outerTubeBasePoints[i - 1], outerTubeBasePoints[i], innerTubeBasePoints[i - 1], innerTubeBasePoints[i]);
-		AddQuad(innerTubeTopPoints[i - 1], innerTubeTopPoints[i], outerTubeTopPoints[i - 1], outerTubeTopPoints[i]);
-		AddQuad(outerTubeTopPoints[i - 1], outerTubeTopPoints[i], outerTubeBasePoints[i - 1], outerTubeBasePoints[i]);
-		AddQuad(innerTubeBasePoints[i - 1], innerTubeBasePoints[i], innerTubeTopPoints[i - 1], innerTubeTopPoints[i]);
-	}
-	//add the last quads
-	AddQuad(outerTubeBasePoints[a_nSubdivisions - 1], outerTubeBasePoints[0], innerTubeBasePoints[a_nSubdivisions - 1], innerTubeBasePoints[0]);
-	AddQuad(innerTubeTopPoints[a_nSubdivisions - 1], innerTubeTopPoints[0], outerTubeTopPoints[a_nSubdivisions - 1], outerTubeTopPoints[0]);
-	AddQuad(outerTubeTopPoints[a_nSubdivisions - 1], outerTubeTopPoints[0], outerTubeBasePoints[a_nSubdivisions - 1], outerTubeBasePoints[0]);
-	AddQuad(innerTubeBasePoints[a_nSubdivisions - 1], innerTubeBasePoints[0], innerTubeTopPoints[a_nSubdivisions - 1], innerTubeTopPoints[0]);
-	
 	// Adding information about color
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
@@ -433,7 +374,11 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateTorus(a_fOuterRadius, a_fInnerRadius, a_nSubdivisionsA, a_nSubdivisionsB, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
 	// -------------------------------
 
 	// Adding information about color
@@ -446,7 +391,7 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 		a_fRadius = 0.01f;
 
 	//Sets minimum and maximum of subdivisions
-	if (a_nSubdivisions < 3)
+	if (a_nSubdivisions < 1)
 	{
 		GenerateCube(a_fRadius * 2.0f, a_v3Color);
 		return;
@@ -456,52 +401,14 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 
 	Release();
 	Init();
-	//???How do???? Map????
-	lowerSpherePoints = new vector3[a_nSubdivisions];
-	middleSpherePoints = new vector3[a_nSubdivisions];
-	upperSpherePoints = new vector3[a_nSubdivisions];
-	for (size_t i = 0; i < a_nSubdivisions; i++)
-	{
-		lowerSpherePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		middleSpherePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-	}
-	////make a new variable using the given number of subdivisions for the number of vec3's needed for the sphere
-	//int numPoints = (a_nSubdivisions - 2) * 12 + 2;
-	//spherePoints = new vector3[numPoints];
-	////variable for number of subdivisions with a unique radius
-	//int numUniqueSubdivisions = (a_nSubdivisions - 2) / 2;
-	//subdivisionRadii = new float[numUniqueSubdivisions];
-	////get the radii for the subdivisions
-	//for (size_t i = 0; i < numUniqueSubdivisions; i++)
-	//{
-	//	subdivisionRadii[i] = a_fRadius * ((i + 1) / numUniqueSubdivisions);
-	//}
-	////make the first point of the sphere (the bottom)
-	//spherePoints[0] = { 0,0,0 };
-	////counter for determining which radius to use
-	//int radiusCounter = 0;
-	////counter for determining the proper height for the subdivision points
-	//int heightCounter = 1;
-	////add the rest of the points for the sphere (except the top)
-	//for (size_t i = 1; i < numPoints - 1; i++)
-	//{
-	//	spherePoints[i] = { subdivisionRadii[radiusCounter] * cos(((2 * PI) / 12) * i), heightCounter / (a_fRadius * 2), subdivisionRadii[radiusCounter] * sin(((2 * PI) / 12) * i) };
-	//	if (radiusCounter < numUniqueSubdivisions)
-	//		radiusCounter++;
-	//	else
-	//		radiusCounter--;
-	//	heightCounter++;
-	//}
-	////make the last point of the sphere
-	//spherePoints[numPoints - 1] = { 0, a_fRadius * 2, 0 };
 
-	////add the tris for the base and the top of the sphere
-	//for (size_t i = 2; i < 13; i++)
-	//{
-	//	AddTri(spherePoints[0], spherePoints[i - 1], spherePoints[i]);
-	//}
-	////add the last tri for the side of the cone
-	//AddTri(spherePoints[0], spherePoints[12], spherePoints[1]);
+	// Replace this with your code
+	Mesh* pMesh = new Mesh();
+	pMesh->GenerateSphere(a_fRadius, a_nSubdivisions, a_v3Color);
+	m_lVertexPos = pMesh->GetVertexList();
+	m_uVertexCount = m_lVertexPos.size();
+	SafeDelete(pMesh);
+	// -------------------------------
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);

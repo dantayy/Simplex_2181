@@ -5,21 +5,7 @@ Date: 2017/05
 #ifndef __MYMESH_H_
 #define __MYMESH_H_
 
-#define USEBASICX
-#ifdef USEBASICX
-#include "BasicX\BasicX.h"
-using namespace BasicX;
-#else
-#include "Simplex\Simplex.h"
-using namespace Simplex;
-#endif // USEBASICX
-
-#include "SFML\Window.hpp"
-#include "SFML\Graphics.hpp"
-#include "SFML\OpenGL.hpp"
-
-#include "ControllerConfiguration.h"
-#include "imgui\ImGuiObject.h"
+#include "Definitions.h"
 
 class MyMesh
 {
@@ -33,18 +19,6 @@ class MyMesh
 	std::vector<vector3> m_lVertexCol;	//List of Colors
 
 	ShaderManager* m_pShaderMngr = nullptr;	//Shader Manager
-
-	vector3 * conePoints; //array for points used to draw a cone
-	vector3 * cylinderBasePoints; //array for points used to draw a cylinder base
-	vector3 * cylinderTopPoints; //array for points used to draw a cylinder top
-	vector3 * innerTubeBasePoints; //array for points used to draw a tube's inner base
-	vector3 * innerTubeTopPoints; //array for points used to draw a tube's inner top
-	vector3 * outerTubeBasePoints; //array for points used to draw a tube's outer base
-	vector3 * outerTubeTopPoints; //array for points used to draw a tube's outer top
-	vector3 * lowerSpherePoints; //array for lower points used to draw a sphere
-	vector3 * middleSpherePoints; //array for middle points used to draw a sphere
-	vector3 * upperSpherePoints; //array for upper points used to draw a sphere
-
 
 public:
 	/*
