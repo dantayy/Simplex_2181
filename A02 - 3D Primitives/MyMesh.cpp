@@ -451,9 +451,32 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Release();
 	Init();
 
-	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
-	// -------------------------------
+	//make a new variable using the given number of subdivisions for the number of vec3's needed for the sphere
+	int numPoints = (a_nSubdivisions - 2) * 12 + 2;
+	spherePoints = new vector3[numPoints];
+	//variable for number of subdivisions with a unique radius
+	int numUniqueSubdivisions = (a_nSubdivisions - 2) / 2;
+	subdivisionRadii = new float[numUniqueSubdivisions];
+	//get the radii for the subdivisions
+	for (size_t i = 0; i < numUniqueSubdivisions; i++)
+	{
+		subdivisionRadii[i] = a_fRadius * ((i + 1) / numUniqueSubdivisions);
+	}
+	//make the first point of the sphere (the bottom)
+	spherePoints[0] = { 0,0,0 };
+	//counter for determining which radius to use
+	int counter = 0;
+	//add the rest of the points for the sphere (except the top)
+	for (size_t i = 1; i < numPoints - 1; i++)
+	{
+		float pointHeight = a_fRadius * 2 - (numUniqueSubdivisions); //FIX THIS!
+		cylinderBasePoints[i] = { subdivisionRadii[counter] * cos(((2 * PI) / 12) * i), 0, subdivisionRadii[counter] * sin(((2 * PI) / 12) * i) };
+		if (counter < numUniqueSubdivisions)
+			counter++;
+		else
+			counter--;
+
+	}
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);

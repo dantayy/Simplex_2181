@@ -42,6 +42,7 @@ class MyMesh
 	vector3 * outerTubeBasePoints; //array for points used to draw a tube
 	vector3 * outerTubeTopPoints; //array for points used to draw a tube
 	vector3 * spherePoints; //array for points used to draw a sphere
+	float * subdivisionRadii; //array for the radii of the subdivisions of the sphere
 
 
 public:
