@@ -280,22 +280,25 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	//calculate the positions for the base
 	for (size_t i = 0; i < a_nSubdivisions; i++)
 	{
-		conePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		conePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight/2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
 	}
 	//add all the tris for the base (except for the last one)
 	for (size_t i = 1; i < a_nSubdivisions; i++)
 	{
-		AddTri({ 0,0,0 }, conePoints[i - 1], conePoints[i]);
+		AddTri({ 0,-a_fHeight / 2,0 }, conePoints[i - 1], conePoints[i]);
 	}
 	//add the last tri for the base
-	AddTri({ 0,0,0 }, conePoints[a_nSubdivisions - 1], conePoints[0]);
+	AddTri({ 0,-a_fHeight/2,0 }, conePoints[a_nSubdivisions - 1], conePoints[0]);
 	//add tris from the base circle to the top of the cone (except for the last one)
 	for (size_t i = 1; i < a_nSubdivisions; i++)
 	{
-		AddTri({ 0,a_fHeight,0 }, conePoints[i - 1], conePoints[i]);
+		if (i / (2 * PI) > PI)
+			AddTri({ 0,a_fHeight/2,0 }, conePoints[i - 1], conePoints[i]);
+		else
+			AddTri({ 0,a_fHeight/2,0 }, conePoints[i], conePoints[i - 1]);
 	}
 	//add the last tri for the side of the cone
-	AddTri({ 0,a_fHeight,0 }, conePoints[a_nSubdivisions - 1], conePoints[0]);
+	AddTri({ 0,a_fHeight/2,0 }, conePoints[0], conePoints[a_nSubdivisions - 1]);
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -324,22 +327,25 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	//calculate the positions for the base and top
 	for (size_t i = 0; i < a_nSubdivisions; i++)
 	{
-		cylinderBasePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		cylinderTopPoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		cylinderBasePoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		cylinderTopPoints[i] = { a_fRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
 	}
 	//add all the tris and quads for the base, top, and what connects them (except for the last ones)
 	for (size_t i = 1; i < a_nSubdivisions; i++)
 	{
-		AddTri({ 0,0,0 }, cylinderBasePoints[i - 1], cylinderBasePoints[i]);
-		AddTri({ 0,a_fHeight,0 }, cylinderTopPoints[i], cylinderTopPoints[i - 1]);
-		AddQuad(cylinderBasePoints[i - 1], cylinderBasePoints[i], cylinderTopPoints[i - 1], cylinderTopPoints[i]);
+		AddTri({ 0,-a_fHeight / 2,0 }, cylinderBasePoints[i - 1], cylinderBasePoints[i]);
+		AddTri({ 0,a_fHeight / 2,0 }, cylinderTopPoints[i], cylinderTopPoints[i - 1]);
+		if(i/(2*PI) > PI)
+			AddQuad(cylinderBasePoints[i - 1], cylinderBasePoints[i], cylinderTopPoints[i - 1], cylinderTopPoints[i]);
+		else
+			AddQuad(cylinderBasePoints[i], cylinderBasePoints[i - 1], cylinderTopPoints[i], cylinderTopPoints[i - 1]);
 	}
 	//add the last tri for the base
-	AddTri({ 0,0,0 }, cylinderBasePoints[a_nSubdivisions - 1], cylinderBasePoints[0]);
+	AddTri({ 0,-a_fHeight / 2,0 }, cylinderBasePoints[a_nSubdivisions - 1], cylinderBasePoints[0]);
 	//add the last tri for the top
-	AddTri({ 0,a_fHeight,0 }, cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
+	AddTri({ 0,a_fHeight / 2,0 }, cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
 	//add the last quad
-	AddQuad(cylinderBasePoints[a_nSubdivisions - 1], cylinderBasePoints[0], cylinderTopPoints[a_nSubdivisions - 1], cylinderTopPoints[0]);
+	AddQuad(cylinderBasePoints[0], cylinderBasePoints[a_nSubdivisions - 1], cylinderTopPoints[0], cylinderTopPoints[a_nSubdivisions - 1]);
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
@@ -379,10 +385,10 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	//calculate the positions for the inner and outer bases and tops
 	for (size_t i = 0; i < a_nSubdivisions; i++)
 	{
-		innerTubeBasePoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		innerTubeTopPoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		outerTubeBasePoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), 0, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
-		outerTubeTopPoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		innerTubeBasePoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		innerTubeTopPoints[i] = { a_fInnerRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fInnerRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		outerTubeBasePoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), -a_fHeight / 2, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
+		outerTubeTopPoints[i] = { a_fOuterRadius * cos(((2 * PI) / a_nSubdivisions) * i), a_fHeight / 2, a_fOuterRadius * sin(((2 * PI) / a_nSubdivisions) * i) };
 	}
 	//add all the quads for the tube (except for the last ones)
 	for (size_t i = 1; i < a_nSubdivisions; i++)
@@ -450,33 +456,44 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 
 	Release();
 	Init();
+	//???How do???? Map????
+	////make a new variable using the given number of subdivisions for the number of vec3's needed for the sphere
+	//int numPoints = (a_nSubdivisions - 2) * 12 + 2;
+	//spherePoints = new vector3[numPoints];
+	////variable for number of subdivisions with a unique radius
+	//int numUniqueSubdivisions = (a_nSubdivisions - 2) / 2;
+	//subdivisionRadii = new float[numUniqueSubdivisions];
+	////get the radii for the subdivisions
+	//for (size_t i = 0; i < numUniqueSubdivisions; i++)
+	//{
+	//	subdivisionRadii[i] = a_fRadius * ((i + 1) / numUniqueSubdivisions);
+	//}
+	////make the first point of the sphere (the bottom)
+	//spherePoints[0] = { 0,0,0 };
+	////counter for determining which radius to use
+	//int radiusCounter = 0;
+	////counter for determining the proper height for the subdivision points
+	//int heightCounter = 1;
+	////add the rest of the points for the sphere (except the top)
+	//for (size_t i = 1; i < numPoints - 1; i++)
+	//{
+	//	spherePoints[i] = { subdivisionRadii[radiusCounter] * cos(((2 * PI) / 12) * i), heightCounter / (a_fRadius * 2), subdivisionRadii[radiusCounter] * sin(((2 * PI) / 12) * i) };
+	//	if (radiusCounter < numUniqueSubdivisions)
+	//		radiusCounter++;
+	//	else
+	//		radiusCounter--;
+	//	heightCounter++;
+	//}
+	////make the last point of the sphere
+	//spherePoints[numPoints - 1] = { 0, a_fRadius * 2, 0 };
 
-	//make a new variable using the given number of subdivisions for the number of vec3's needed for the sphere
-	int numPoints = (a_nSubdivisions - 2) * 12 + 2;
-	spherePoints = new vector3[numPoints];
-	//variable for number of subdivisions with a unique radius
-	int numUniqueSubdivisions = (a_nSubdivisions - 2) / 2;
-	subdivisionRadii = new float[numUniqueSubdivisions];
-	//get the radii for the subdivisions
-	for (size_t i = 0; i < numUniqueSubdivisions; i++)
-	{
-		subdivisionRadii[i] = a_fRadius * ((i + 1) / numUniqueSubdivisions);
-	}
-	//make the first point of the sphere (the bottom)
-	spherePoints[0] = { 0,0,0 };
-	//counter for determining which radius to use
-	int counter = 0;
-	//add the rest of the points for the sphere (except the top)
-	for (size_t i = 1; i < numPoints - 1; i++)
-	{
-		float pointHeight = a_fRadius * 2 - (numUniqueSubdivisions); //FIX THIS!
-		cylinderBasePoints[i] = { subdivisionRadii[counter] * cos(((2 * PI) / 12) * i), 0, subdivisionRadii[counter] * sin(((2 * PI) / 12) * i) };
-		if (counter < numUniqueSubdivisions)
-			counter++;
-		else
-			counter--;
-
-	}
+	////add the tris for the base and the top of the sphere
+	//for (size_t i = 2; i < 13; i++)
+	//{
+	//	AddTri(spherePoints[0], spherePoints[i - 1], spherePoints[i]);
+	//}
+	////add the last tri for the side of the cone
+	//AddTri(spherePoints[0], spherePoints[12], spherePoints[1]);
 
 	// Adding information about color
 	CompleteMesh(a_v3Color);
