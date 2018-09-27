@@ -14,7 +14,8 @@ Date: 2017/05
 
 class Application
 {
-	MyMesh* m_pMesh = nullptr;
+	int numCubes = 46;
+	MyMesh * m_pMeshes = nullptr;
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 
 private:
