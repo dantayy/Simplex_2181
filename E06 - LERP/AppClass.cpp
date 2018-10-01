@@ -52,14 +52,30 @@ void Application::Display(void)
 	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
 	//calculate the current position
-	vector3 v3CurrentPos;
-	
-
-
-
-
-	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
+	static vector3 v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
+	//start position for lerp operation (will change based on what items are in the list)
+	static vector3 startPosition = { 0,0,0 };
+	//end position for lerp operation (will change based on what items are in the list)
+	static vector3 endPosition = m_stopsList[0];
+	//counter for lerping
+	static float counter = 0.0f;
+	//check to see if the lerp has reached 100% yet
+	if (counter >= 1.0f)
+	{
+		//if all the items haven't been popped yet, reset the lerp values
+		if (!m_stopsList.empty())
+		{
+			startPosition = m_stopsList[0];
+			m_stopsList.erase(m_stopsList.begin());
+			endPosition = m_stopsList[0];
+		}
+		//reset the counter
+		counter = 0.0f;
+	}
+	//perform the lerp operation
+	v3CurrentPos = glm::lerp(startPosition, endPosition, counter);
+	//increment lerp percentage
+	counter += 0.01f;
 	//-------------------
 	
 
