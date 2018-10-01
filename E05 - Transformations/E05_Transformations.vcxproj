@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{7853C04E-6EA4-4588-AEA3-C1DFAA68A9BD}</ProjectGuid>
+    <ProjectGuid>{21D5D379-97A7-434C-BD76-B3989AED4D99}</ProjectGuid>
     <RootNamespace>C11_TranslationAndScale</RootNamespace>
     <ProjectName>E05 - Transformations</ProjectName>
     <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
