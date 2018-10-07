@@ -82,25 +82,27 @@ void Application::Display(void)
 		//custom code for calculating each sphere's position on their respective torus at any given time
 		vector3 v3CurrentPos = ZERO_V3;
 		//static vars for seeing which stop to go to/how far in the lerp we are
-		static int stopCounter = 0;
+		static int verticesHit = 0;
+		static int stopNumber = 0;
 		static float lerpCounter = 0.0f;
-		//reset the lerp counter
+		//reset the lerp counter and increment the number of vertices hit when the sphere has reached its destination
 		if (lerpCounter >= 1.0f)
 		{
-			//increment the stop counter
-			if (stopCounter >= stopListList[i].size() - 1) //special case to help get the sphere from the last point back to the first point
-				stopCounter = 0;
-			else
-				stopCounter++;
+			verticesHit++;
+			////reset the verticesHit when it get's too big (bugs out and resets at the wrong times atm)
+			//if (verticesHit >= stopListList[i].size() * 10)
+			//	verticesHit = 0;
 			lerpCounter = 0.0f;
 		}
+		//determine which stop you're on using modulus
+		stopNumber = verticesHit % stopListList[i].size();
 		//LERP each sphere's position
-		if (stopCounter >= stopListList[i].size() - 1)//special case connecting last point to first point
-			v3CurrentPos = glm::lerp(stopListList[i][stopCounter], stopListList[i][0], lerpCounter);
+		if (stopNumber >= stopListList[i].size() - 1)//special case connecting last point to first point
+			v3CurrentPos = glm::lerp(stopListList[i][stopNumber], stopListList[i][0], lerpCounter);
 		else
-			v3CurrentPos = glm::lerp(stopListList[i][stopCounter], stopListList[i][stopCounter + 1], lerpCounter);
+			v3CurrentPos = glm::lerp(stopListList[i][stopNumber], stopListList[i][stopNumber + 1], lerpCounter);
 		//increment the lerp counter
-		lerpCounter += 0.001f;
+		lerpCounter += 0.01f;
 
 		//calculate the current position
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
