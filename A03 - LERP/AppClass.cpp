@@ -23,6 +23,7 @@ void Application::InitVariables(void)
 		m_uOrbits = 7;
 
 	float fSize = 1.0f; //initial size of orbits
+	float fRadius = 0.95f; //initial orbit radius
 
 	//creating a color using the spectrum 
 	uint uColor = 650; //650 is Red
@@ -36,7 +37,16 @@ void Application::InitVariables(void)
 	{
 		vector3 v3Color = WaveLengthToRGB(uColor); //calculate color based on wavelength
 		m_shapeList.push_back(m_pMeshMngr->GenerateTorus(fSize, fSize - 0.1f, 3, i, v3Color)); //generate a custom torus and add it to the meshmanager
+		//list of stops for the sphere traveling around this torus
+		std::vector<vector3> stopList;
+		for (size_t j = 0; j < i; j++)
+		{
+			stopList.push_back(vector3(fRadius * cos(((2 * PI) / i) * j), fRadius * sin(((2 * PI) / i) * j), 0));
+		}
+		//add that list to the list of lists
+		stopListList.push_back(stopList);
 		fSize += 0.5f; //increment the size for the next orbit
+		fRadius += 0.5f; //increment the radius for the next orbit
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
 	}
 }
@@ -69,8 +79,30 @@ void Application::Display(void)
 	{
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X));
 
-		//calculate the current position
+		//custom code for calculating each sphere's position on their respective torus at any given time
 		vector3 v3CurrentPos = ZERO_V3;
+		//static vars for seeing which stop to go to/how far in the lerp we are
+		static int stopCounter = 0;
+		static float lerpCounter = 0.0f;
+		//reset the lerp counter
+		if (lerpCounter >= 1.0f)
+		{
+			//increment the stop counter
+			if (stopCounter >= stopListList[i].size() - 1) //special case to help get the sphere from the last point back to the first point
+				stopCounter = 0;
+			else
+				stopCounter++;
+			lerpCounter = 0.0f;
+		}
+		//LERP each sphere's position
+		if (stopCounter >= stopListList[i].size() - 1)//special case connecting last point to first point
+			v3CurrentPos = glm::lerp(stopListList[i][stopCounter], stopListList[i][0], lerpCounter);
+		else
+			v3CurrentPos = glm::lerp(stopListList[i][stopCounter], stopListList[i][stopCounter + 1], lerpCounter);
+		//increment the lerp counter
+		lerpCounter += 0.001f;
+
+		//calculate the current position
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
