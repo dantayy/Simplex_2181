@@ -21,6 +21,8 @@ class Application
 
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 
+	float m_fFovy;
+
 private:
 	static ImGuiObject gui; //GUI object
 
