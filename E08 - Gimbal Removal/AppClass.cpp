@@ -25,18 +25,8 @@ void Application::Display(void)
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 
-	////make a quaternion for the rotation by combining all of the individual axis rotations together
-	//quaternion xRot = quaternion(vector3(glm::radians(m_v3Rotation.x), 0, 0));
-	//quaternion yRot = quaternion(vector3(0, glm::radians(m_v3Rotation.y), 0));
-	//quaternion zRot = quaternion(vector3(0, 0, glm::radians(m_v3Rotation.z)));
-	//quaternion totalRot = xRot * yRot * zRot;
-
-	////SLERP between where the object currently is and where it should be
-	//m_m4Model = glm::mix(m_m4Model, ToMatrix4(totalRot), 1.0f);
-
-	//m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_m4Model));
-
-	m_qOrientation = m_qOrientation * glm::angleAxis(glm::radians(1.0f), vector3(glm::radians(m_v3Rotation.x), glm::radians(m_v3Rotation.y), glm::radians(m_v3Rotation.z)));
+	//m_qOrientation = m_qOrientation * glm::angleAxis(glm::radians(1.0f), vector3(1, 1, 1));
+	//m_qOrientation = glm::angleAxis(glm::radians(1.0f), vector3(m_qOrientation.x, m_qOrientation.y, m_qOrientation.z)) * m_qOrientation;
 	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qOrientation));
 	
 	// draw a skybox
