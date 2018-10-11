@@ -45,6 +45,15 @@ void Application::Display(void)
 	//draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
 
+	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
+	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
+
+	float fovy = 45.0f; //field of view
+	float aspect = m_pSystem->GetWindowWidth() / m_pSystem->GetWindowHeight(); //aspect ratio
+	float zNear = 0.0001f; //near clippling plane
+	float zFar = 1000.0f; //far clipping plane
+
+
 	//calculate view and projection
 	switch (m_uProjection)
 	{
@@ -53,24 +62,29 @@ void Application::Display(void)
 		m_pCamera->ResetCamera();
 		break;
 	case 2:
-		m_pCamera->ResetCamera();
+		fovy = 90.0f;
+		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
 		break;
 	case 3:
-		m_pCamera->ResetCamera();
+		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
 		break;
 	case 4:
-		m_pCamera->ResetCamera();
+		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
 		break;
 	case 5:
-		m_pCamera->ResetCamera();
+		zFar = 0.1f;
+		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
 		break;
 	case 6:
-		m_pCamera->ResetCamera();
+		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
 		break;
 	case 7:
-		m_pCamera->ResetCamera();
+		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
 		break;
 	}
+
+	m_pCameraMngr->SetProjectionMatrix(m4Projection);
+	m_pCameraMngr->SetViewMatrix(m4View);
 
 	m_pCamera->CalculateProjectionMatrix();
 	m_pCamera->CalculateViewMatrix();
