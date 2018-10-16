@@ -23,6 +23,8 @@ class Application
 
 	float m_fFovy;
 
+	MyMesh* m_pMesh = nullptr;
+
 private:
 	static ImGuiObject gui; //GUI object
 
