@@ -48,40 +48,52 @@ void Application::Display(void)
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 
+	//vars for projection matrix
 	float fovy = 45.0f; //field of view
 	float aspect = m_pSystem->GetWindowWidth() / m_pSystem->GetWindowHeight(); //aspect ratio
 	float zNear = 0.0001f; //near clippling plane
 	float zFar = 1000.0f; //far clipping plane
-
+	//vars for view matrix
+	vector3 v3Position = vector3(0.0f, 0.0f, 10.0f);
+	vector3 v3Target = vector3(0.0f, 0.0f, -10.0f);
+	vector3 v3Up = vector3(0.0f, 1.0f, 0.0f);
 
 	//calculate view and projection
 	switch (m_uProjection)
 	{
 	default:
 	case 1:
-		m_pCamera->ResetCamera();
+		//m_pCamera->ResetCamera();
 		break;
 	case 2:
 		fovy = 90.0f;
-		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
 		break;
 	case 3:
-		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
+		v3Position = vector3(5.0f, 0.0f, 0.0f); //move camera to the right
+		v3Target = vector3(-5.0f, 0.0f, 0.0f); //have it facing the left
+		v3Up = vector3(0.0f, 0.0f, -1.0f); //have it's "up" point into the z axis
 		break;
 	case 4:
-		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
+		v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
+		v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
 		break;
 	case 5:
-		zFar = 0.1f;
-		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
+		v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
+		v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
+		zNear = 0.08f; //move the near plane up so the closest object doesn't render (???)
 		break;
 	case 6:
-		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
+		v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
+		v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
+		zNear = 0.06f; //move the far plane towards you so the object farthest from you doesn't render (???)
 		break;
 	case 7:
-		m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
+		v3Up = vector3(0.0f, -1.0f, 0.0f); //turn the camera upside-down
 		break;
 	}
+
+	m4Projection = glm::perspective(fovy, aspect, zNear, zFar);
+	m4View = glm::lookAt(v3Position, v3Target, v3Up);
 
 	m_pCameraMngr->SetProjectionMatrix(m4Projection);
 	m_pCameraMngr->SetViewMatrix(m4View);

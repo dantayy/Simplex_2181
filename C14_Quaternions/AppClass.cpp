@@ -79,7 +79,7 @@ void Application::Display(void)
 	m4Projection = glm::perspective(fFOV, fAspect, fNear,fFar);
 	vector3 v3Position = vector3(0.0f,0.0f,10.0f);
 	vector3 v3Target;
-	vector3 v3Up = vector3(0.0f,1.0f,0.0f);
+	vector3 v3Up = vector3(0.0f,-1.0f,0.0f);
 	m4View = glm::lookAt(v3Position, v3Target, v3Up);
 
 	matrix4 m4Model = glm::translate(m_v3Orientation);
