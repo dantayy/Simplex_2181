@@ -63,32 +63,46 @@ void Application::Display(void)
 	{
 	default:
 	case 1:
-		//m_pCamera->ResetCamera();
+		m_pCamera->ResetCamera();
 		break;
 	case 2:
-		fovy = 90.0f;
+		m_pCamera->ResetCamera();
+		//fovy = 90.0f;
+		m_pCamera->SetPerspective(false);
 		break;
 	case 3:
-		v3Position = vector3(5.0f, 0.0f, 0.0f); //move camera to the right
-		v3Target = vector3(-5.0f, 0.0f, 0.0f); //have it facing the left
-		v3Up = vector3(0.0f, 0.0f, -1.0f); //have it's "up" point into the z axis
+		m_pCamera->ResetCamera();
+		//v3Position = vector3(5.0f, 0.0f, 0.0f); //move camera to the right
+		//v3Target = vector3(-5.0f, 0.0f, 0.0f); //have it facing the left
+		//v3Up = vector3(0.0f, 0.0f, -1.0f); //have it's "up" point into the z axis
+		m_pCamera->SetPositionTargetAndUpward(vector3(20.0f, 0.0f, 0.0f), vector3(-5.0f, 0.0f, 0.0f), vector3(0.0f, 0.0f, -1.0f));
 		break;
 	case 4:
-		v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
-		v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
+		m_pCamera->ResetCamera();
+		//v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
+		//v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
+		m_pCamera->SetPosition(AXIS_Z * -15.0f);
 		break;
 	case 5:
-		v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
-		v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
-		zNear = 0.08f; //move the near plane up so the closest object doesn't render (???)
+		m_pCamera->ResetCamera();
+		//v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
+		//v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
+		//zNear = 0.08f; //move the near plane up so the closest object doesn't render (???)
+		m_pCamera->SetPosition(AXIS_Z * -15.0f);
+		m_pCamera->SetNearFar(vector2(5.0f, 1000.0f));
 		break;
 	case 6:
-		v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
-		v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
-		zNear = 0.06f; //move the far plane towards you so the object farthest from you doesn't render (???)
+		m_pCamera->ResetCamera();
+		//v3Position = vector3(0.0f, 0.0f, -10.0f); //move the camera behind the three objects
+		//v3Target = vector3(0.0f, 0.0f, 10.0f); //turn the camera to face the three objects again, but from behind
+		//zNear = 0.06f; //move the far plane towards you so the object farthest from you doesn't render (???)
+		m_pCamera->SetPosition(AXIS_Z * -15.0f);
+		m_pCamera->SetNearFar(vector2(0.001f, 10.0f));
 		break;
 	case 7:
-		v3Up = vector3(0.0f, -1.0f, 0.0f); //turn the camera upside-down
+		m_pCamera->ResetCamera();
+		//v3Up = vector3(0.0f, -1.0f, 0.0f); //turn the camera upside-down
+		m_pCamera->SetUp(vector3(0.0f, -1.0f, 0.0f));
 		break;
 	}
 
