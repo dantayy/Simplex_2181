@@ -50,6 +50,9 @@ void Application::Display(void)
 
 	//Render the list of MyMeshManager
 	m_pMyMeshMngr->Render();
+
+	//m_pCamera->CalculateProjectionMatrix();
+	//m_pCamera->CalculateViewMatrix();
 	
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
