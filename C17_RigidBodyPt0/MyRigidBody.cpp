@@ -63,6 +63,47 @@ void MyRigidBody::Release(void)
 MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
 {
 	Init();
+	
+	if (a_pointList.size() == 0)
+		return;
+
+	//make the min and max values not 0
+	m_v3MinL = a_pointList[0];
+	m_v3MaxL = a_pointList[0];
+
+	//find lowest and highest x y and z values
+	for (size_t i = 1; i < a_pointList.size(); i++)
+	{
+		if (m_v3MinL.x > a_pointList[i].x)
+			m_v3MinL.x = a_pointList[i].x;
+		else if (m_v3MaxL.x < a_pointList[i].x)
+			m_v3MaxL.x = a_pointList[i].x;
+		if (m_v3MinL.y > a_pointList[i].y)
+			m_v3MinL.y = a_pointList[i].y;
+		else if (m_v3MaxL.y < a_pointList[i].y)
+			m_v3MaxL.y = a_pointList[i].y;
+		if (m_v3MinL.z > a_pointList[i].z)
+			m_v3MinL.z = a_pointList[i].z;
+		else if (m_v3MaxL.z < a_pointList[i].z)
+			m_v3MaxL.z = a_pointList[i].z;
+	}
+
+	//set the center based on the min and max vectors
+	m_v3Center = (m_v3MaxL + m_v3MinL) / 2.0;
+
+	////find the radius for the object (processing power expensive for larger amounts of points)
+	//for (size_t i = 0; i < a_pointList.size(); i++)
+	//{
+	//	float fDistance = glm::distance(m_v3Center, a_pointList[i]);
+	//	if (m_fRadius < fDistance)
+	//		m_fRadius = fDistance;
+	//}
+
+	//find the approximate radius for the object (much less taxing, also less accurate)
+	m_fRadius = glm::distance(m_v3Center, m_v3MaxL);
+
+	//get half the distance for all three dimensions for bounding boxes
+	m_v3HalfWidth = (m_v3MaxL - m_v3MinL) / 2.0f;
 }
 MyRigidBody::MyRigidBody(MyRigidBody const& other)
 {
@@ -102,8 +143,13 @@ void MyRigidBody::AddToRenderList(void)
 {
 	if (!m_bVisible)
 		return;
+
+	m_pMeshMngr->AddWireSphereToRenderList(m_m4ToWorld * glm::translate(m_v3Center) * glm::scale(vector3(m_fRadius)), m_v3Color, RENDER_WIRE);
+	m_pMeshMngr->AddWireCubeToRenderList(m_m4ToWorld * glm::translate(m_v3Center) * glm::scale(m_v3HalfWidth * 2), m_v3Color, RENDER_WIRE);
+
 }
 bool MyRigidBody::IsColliding(MyRigidBody* const other)
 {
-	return false;
+	//THIS DOESN'T ACCOUNT FOR GLOBAL SPACE, WILL NEED TO BE FIXED
+	return glm::distance(m_v3Center, other->m_v3Center) < m_fRadius + other->m_fRadius;
 }
