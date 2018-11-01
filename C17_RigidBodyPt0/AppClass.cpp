@@ -38,7 +38,7 @@ void Application::Update(void)
 
 	//reset the color of the rigid bodies to white 
 	m_pCreeperRB->SetColor(C_WHITE);
-	//m_pSteveRB->SetColor(C_WHITE);
+	m_pSteveRB->SetColor(C_WHITE);
 
 	//Set model matrix to the creeper
 	m_pCreeper->SetModelMatrix(glm::translate(m_v3Creeper) * ToMatrix4(m_qArcBall));
@@ -54,17 +54,14 @@ void Application::Update(void)
 	//m_pCreeper->PlaySequence();
 	m_pCreeperRB->AddToRenderList();
 
-	m_pSteve->AddToRenderList();
-	m_pSteveRB->AddToRenderList();
-
-	m_pCreeperRB->SetColor(C_WHITE);
-	m_pSteveRB->SetColor(C_WHITE);
-
 	if (m_pCreeperRB->IsColliding(m_pSteveRB))
 	{
 		m_pCreeperRB->SetColor(C_RED);
 		m_pSteveRB->SetColor(C_RED);
 	}
+
+	m_pSteve->AddToRenderList();
+	m_pSteveRB->AddToRenderList();
 }
 void Application::Display(void)
 {

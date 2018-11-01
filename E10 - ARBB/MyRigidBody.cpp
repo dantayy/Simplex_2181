@@ -88,27 +88,35 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	//get the local corners
 	vector3 corners[8];
 
-	corners[0] = m_v3MinL;
-	corners[1] = vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z);
-	corners[2] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z);
-	corners[3] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z);
-	corners[4] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z);
-	corners[5] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z);
-	corners[6] = vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z);
-	corners[7] = m_v3MaxL;
+	corners[0] = vector3(m_v3MinL.x, m_v3MinL.y, m_v3MinL.z);
+	corners[1] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MinL.z);
+	corners[2] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MinL.z);
+	corners[3] = vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MinL.z);
+	
+	corners[4] = vector3(m_v3MinL.x, m_v3MinL.y, m_v3MaxL.z);
+	corners[5] = vector3(m_v3MaxL.x, m_v3MinL.y, m_v3MaxL.z);
+	corners[6] = vector3(m_v3MinL.x, m_v3MaxL.y, m_v3MaxL.z);
+	corners[7] = vector3(m_v3MaxL.x, m_v3MaxL.y, m_v3MaxL.z);
+
 
 	//translate them to global space and adjust the min and max global vectors as you go
 	for (size_t i = 0; i < corners->length(); i++)
 	{
 		corners[i] = vector3(m_m4ToWorld * vector4(corners[i], 1.0f));
-		if (m_v3MaxL.x < corners[i].x) m_v3MaxL.x = corners[i].x;
-		else if (m_v3MinL.x > corners[i].x) m_v3MinL.x = corners[i].x;
+	}
 
-		if (m_v3MaxL.y < corners[i].y) m_v3MaxL.y = corners[i].y;
-		else if (m_v3MinL.y > corners[i].y) m_v3MinL.y = corners[i].y;
+	m_v3MaxG = m_v3MinG = corners[0];
 
-		if (m_v3MaxL.z < corners[i].z) m_v3MaxL.z = corners[i].z;
-		else if (m_v3MinL.z > corners[i].z) m_v3MinL.z = corners[i].z;
+	for (size_t i = 0; i < corners->length(); i++)
+	{
+		if (m_v3MaxG.x < corners[i].x) m_v3MaxG.x = corners[i].x;
+		else if (m_v3MinG.x > corners[i].x) m_v3MinG.x = corners[i].x;
+
+		if (m_v3MaxG.y < corners[i].y) m_v3MaxG.y = corners[i].y;
+		else if (m_v3MinG.y > corners[i].y) m_v3MinG.y = corners[i].y;
+
+		if (m_v3MaxG.z < corners[i].z) m_v3MaxG.z = corners[i].z;
+		else if (m_v3MinG.z > corners[i].z) m_v3MinG.z = corners[i].z;
 	}
 	//----------------------------------------
 
