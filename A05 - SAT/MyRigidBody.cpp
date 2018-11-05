@@ -287,6 +287,27 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
 
+	//Axes for this object
+	vector3 v3Ax = vector3(GetMaxGlobal().x, 0.0f, 0.0f) - vector3(GetMinGlobal().x, 0.0f, 0.0f);
+	vector3 v3Ay = vector3(0.0f, GetMaxGlobal().y, 0.0f) - vector3(0.0f, GetMinGlobal().y, 0.0f);
+	vector3 v3Az = vector3(0.0f, 0.0f, GetMaxGlobal().z) - vector3(0.0f, 0.0f, GetMinGlobal().z);
+
+	//Axes for the other object
+	vector3 v3Bx = vector3(a_pOther->GetMaxGlobal().x, 0.0f, 0.0f) - vector3(a_pOther->GetMinGlobal().x, 0.0f, 0.0f);
+	vector3 v3By = vector3(0.0f, a_pOther->GetMaxGlobal().y, 0.0f) - vector3(0.0f, a_pOther->GetMinGlobal().y, 0.0f);
+	vector3 v3Bz = vector3(0.0f, 0.0f, a_pOther->GetMaxGlobal().z) - vector3(0.0f, 0.0f, a_pOther->GetMinGlobal().z);
+
+	//cross product axes
+	vector3 v3AxCrossBx = glm::cross(v3Ax, v3Bx);
+	vector3 v3AxCrossBy = glm::cross(v3Ax, v3By);
+	vector3 v3AxCrossBz = glm::cross(v3Ax, v3Bz);
+	vector3 v3AyCrossBx = glm::cross(v3Ay, v3Bx);
+	vector3 v3AyCrossBy = glm::cross(v3Ay, v3By);
+	vector3 v3AyCrossBz = glm::cross(v3Ay, v3Bz);
+	vector3 v3AzCrossBx = glm::cross(v3Az, v3Bx);
+	vector3 v3AzCrossBy = glm::cross(v3Az, v3By);
+	vector3 v3AzCrossBz = glm::cross(v3Az, v3Bz);
+
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
 }
