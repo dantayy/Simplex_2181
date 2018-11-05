@@ -288,14 +288,14 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	*/
 
 	//Axes for this object
-	vector3 v3Ax = vector3(GetMaxGlobal().x, 0.0f, 0.0f) - vector3(GetMinGlobal().x, 0.0f, 0.0f);
-	vector3 v3Ay = vector3(0.0f, GetMaxGlobal().y, 0.0f) - vector3(0.0f, GetMinGlobal().y, 0.0f);
-	vector3 v3Az = vector3(0.0f, 0.0f, GetMaxGlobal().z) - vector3(0.0f, 0.0f, GetMinGlobal().z);
+	vector3 v3Ax = vector3(GetMaxGlobal().x, GetMinGlobal().y, GetMinGlobal().z) - GetMinGlobal();
+	vector3 v3Ay = vector3(GetMinGlobal().x, GetMaxGlobal().y, GetMinGlobal().z) - GetMinGlobal();
+	vector3 v3Az = vector3(GetMinGlobal().x, GetMinGlobal().y, GetMaxGlobal().z) - GetMinGlobal();
 
 	//Axes for the other object
-	vector3 v3Bx = vector3(a_pOther->GetMaxGlobal().x, 0.0f, 0.0f) - vector3(a_pOther->GetMinGlobal().x, 0.0f, 0.0f);
-	vector3 v3By = vector3(0.0f, a_pOther->GetMaxGlobal().y, 0.0f) - vector3(0.0f, a_pOther->GetMinGlobal().y, 0.0f);
-	vector3 v3Bz = vector3(0.0f, 0.0f, a_pOther->GetMaxGlobal().z) - vector3(0.0f, 0.0f, a_pOther->GetMinGlobal().z);
+	vector3 v3Bx = vector3(a_pOther->GetMaxGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal();
+	vector3 v3By = vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMaxGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal();
+	vector3 v3Bz = vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMaxGlobal().z) - a_pOther->GetMinGlobal();
 
 	//cross product axes
 	vector3 v3AxCrossBx = glm::cross(v3Ax, v3Bx);
