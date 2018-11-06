@@ -318,22 +318,33 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	axes.push_back(v3Bx);
 	axes.push_back(v3By);
 	axes.push_back(v3Bz);
-	axes.push_back(v3AxCrossBx);
-	axes.push_back(v3AxCrossBy);
-	axes.push_back(v3AxCrossBz);
-	axes.push_back(v3AyCrossBx);
-	axes.push_back(v3AyCrossBy);
-	axes.push_back(v3AyCrossBz);
-	axes.push_back(v3AzCrossBx);
-	axes.push_back(v3AzCrossBy);
-	axes.push_back(v3AzCrossBz);
+	//check the cross products and make sure none of them are the 0 vector
+	if(v3AxCrossBx != vector3())
+		axes.push_back(v3AxCrossBx);
+	if (v3AxCrossBy != vector3())
+		axes.push_back(v3AxCrossBy);
+	if (v3AxCrossBz != vector3())
+		axes.push_back(v3AxCrossBz);
+	if (v3AyCrossBx != vector3())
+		axes.push_back(v3AyCrossBx);
+	if (v3AyCrossBy != vector3())
+		axes.push_back(v3AyCrossBy);
+	if (v3AyCrossBz != vector3())
+		axes.push_back(v3AyCrossBz);
+	if (v3AzCrossBx != vector3())
+		axes.push_back(v3AzCrossBx);
+	if (v3AzCrossBy != vector3())
+		axes.push_back(v3AzCrossBy);
+	if (v3AzCrossBz != vector3())
+		axes.push_back(v3AzCrossBz);
+
+	vector3 v3CenterToCenter = GetCenterGlobal() - a_pOther->GetCenterGlobal();
 
 	//test for collision by projecting half-widths onto each axis and comparing their total lengths against the distance between the centers of the objects (also projected on to the axes)
 	for (vector3 axis : axes)
 	{
 		float f_AProjectedHalfWidth = std::abs(glm::dot(GetHalfWidth(), axis));
 		float f_BProjectedHalfWidth = std::abs(glm::dot(a_pOther->GetHalfWidth(), axis));
-		vector3 v3CenterToCenter = GetCenterGlobal() - a_pOther->GetCenterGlobal();
 		float f_ProjectedCenterToCenterDistance = std::abs(glm::dot(v3CenterToCenter, axis)); //get the projected length
 		//if the distance from center to center is greater than the two widths put together, then there is space between the two objects
 		if (f_ProjectedCenterToCenterDistance > f_AProjectedHalfWidth + f_BProjectedHalfWidth)
