@@ -287,26 +287,58 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
 
+	//list of axes to test for collision with
+	std::vector<vector3> axes;
+
 	//Axes for this object
-	vector3 v3Ax = vector3(GetMaxGlobal().x, GetMinGlobal().y, GetMinGlobal().z) - GetMinGlobal();
-	vector3 v3Ay = vector3(GetMinGlobal().x, GetMaxGlobal().y, GetMinGlobal().z) - GetMinGlobal();
-	vector3 v3Az = vector3(GetMinGlobal().x, GetMinGlobal().y, GetMaxGlobal().z) - GetMinGlobal();
+	vector3 v3Ax = glm::normalize(vector3(GetMaxGlobal().x, GetMinGlobal().y, GetMinGlobal().z) - GetMinGlobal());
+	vector3 v3Ay = glm::normalize(vector3(GetMinGlobal().x, GetMaxGlobal().y, GetMinGlobal().z) - GetMinGlobal());
+	vector3 v3Az = glm::normalize(vector3(GetMinGlobal().x, GetMinGlobal().y, GetMaxGlobal().z) - GetMinGlobal());
 
 	//Axes for the other object
-	vector3 v3Bx = vector3(a_pOther->GetMaxGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal();
-	vector3 v3By = vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMaxGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal();
-	vector3 v3Bz = vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMaxGlobal().z) - a_pOther->GetMinGlobal();
+	vector3 v3Bx = glm::normalize(vector3(a_pOther->GetMaxGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal());
+	vector3 v3By = glm::normalize(vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMaxGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal());
+	vector3 v3Bz = glm::normalize(vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMaxGlobal().z) - a_pOther->GetMinGlobal());
 
 	//cross product axes
-	vector3 v3AxCrossBx = glm::cross(v3Ax, v3Bx);
-	vector3 v3AxCrossBy = glm::cross(v3Ax, v3By);
-	vector3 v3AxCrossBz = glm::cross(v3Ax, v3Bz);
-	vector3 v3AyCrossBx = glm::cross(v3Ay, v3Bx);
-	vector3 v3AyCrossBy = glm::cross(v3Ay, v3By);
-	vector3 v3AyCrossBz = glm::cross(v3Ay, v3Bz);
-	vector3 v3AzCrossBx = glm::cross(v3Az, v3Bx);
-	vector3 v3AzCrossBy = glm::cross(v3Az, v3By);
-	vector3 v3AzCrossBz = glm::cross(v3Az, v3Bz);
+	vector3 v3AxCrossBx = glm::normalize(glm::cross(v3Ax, v3Bx));
+	vector3 v3AxCrossBy = glm::normalize(glm::cross(v3Ax, v3By));
+	vector3 v3AxCrossBz = glm::normalize(glm::cross(v3Ax, v3Bz));
+	vector3 v3AyCrossBx = glm::normalize(glm::cross(v3Ay, v3Bx));
+	vector3 v3AyCrossBy = glm::normalize(glm::cross(v3Ay, v3By));
+	vector3 v3AyCrossBz = glm::normalize(glm::cross(v3Ay, v3Bz));
+	vector3 v3AzCrossBx = glm::normalize(glm::cross(v3Az, v3Bx));
+	vector3 v3AzCrossBy = glm::normalize(glm::cross(v3Az, v3By));
+	vector3 v3AzCrossBz = glm::normalize(glm::cross(v3Az, v3Bz));
+
+	//add all of those to the list
+	axes.push_back(v3Ax);
+	axes.push_back(v3Ay);
+	axes.push_back(v3Az);
+	axes.push_back(v3Bx);
+	axes.push_back(v3By);
+	axes.push_back(v3Bz);
+	axes.push_back(v3AxCrossBx);
+	axes.push_back(v3AxCrossBy);
+	axes.push_back(v3AxCrossBz);
+	axes.push_back(v3AyCrossBx);
+	axes.push_back(v3AyCrossBy);
+	axes.push_back(v3AyCrossBz);
+	axes.push_back(v3AzCrossBx);
+	axes.push_back(v3AzCrossBy);
+	axes.push_back(v3AzCrossBz);
+
+	//test for collision by projecting half-widths onto each axis and comparing their total lengths against the distance between the centers of the objects (also projected on to the axes)
+	for (vector3 axis : axes)
+	{
+		float f_AProjectedHalfWidth = std::abs(glm::dot(GetHalfWidth(), axis));
+		float f_BProjectedHalfWidth = std::abs(glm::dot(a_pOther->GetHalfWidth(), axis));
+		vector3 v3CenterToCenter = GetCenterGlobal() - a_pOther->GetCenterGlobal();
+		float f_ProjectedCenterToCenterDistance = std::abs(glm::dot(v3CenterToCenter, axis)); //get the projected length
+		//if the distance from center to center is greater than the two widths put together, then there is space between the two objects
+		if (f_ProjectedCenterToCenterDistance > f_AProjectedHalfWidth + f_BProjectedHalfWidth)
+			return 1;
+	}
 
 	//there is no axis test that separates this two objects
 	return eSATResults::SAT_NONE;
