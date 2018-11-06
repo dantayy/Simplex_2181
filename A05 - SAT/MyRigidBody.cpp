@@ -287,70 +287,180 @@ uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 	(eSATResults::SAT_NONE has a value of 0)
 	*/
 
-	//list of axes to test for collision with
-	std::vector<vector3> axes;
+	////list of axes to test for collision with
+	//std::vector<vector3> axes;
 
-	//Axes for this object
-	vector3 v3Ax = glm::normalize(vector3(GetMaxGlobal().x, GetMinGlobal().y, GetMinGlobal().z) - GetMinGlobal());
-	vector3 v3Ay = glm::normalize(vector3(GetMinGlobal().x, GetMaxGlobal().y, GetMinGlobal().z) - GetMinGlobal());
-	vector3 v3Az = glm::normalize(vector3(GetMinGlobal().x, GetMinGlobal().y, GetMaxGlobal().z) - GetMinGlobal());
+	////Axes for this object
+	//vector3 v3Ax = glm::normalize(vector3(GetMaxGlobal().x, GetMinGlobal().y, GetMinGlobal().z) - GetMinGlobal());
+	//vector3 v3Ay = glm::normalize(vector3(GetMinGlobal().x, GetMaxGlobal().y, GetMinGlobal().z) - GetMinGlobal());
+	//vector3 v3Az = glm::normalize(vector3(GetMinGlobal().x, GetMinGlobal().y, GetMaxGlobal().z) - GetMinGlobal());
 
-	//Axes for the other object
-	vector3 v3Bx = glm::normalize(vector3(a_pOther->GetMaxGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal());
-	vector3 v3By = glm::normalize(vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMaxGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal());
-	vector3 v3Bz = glm::normalize(vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMaxGlobal().z) - a_pOther->GetMinGlobal());
+	////Axes for the other object
+	//vector3 v3Bx = glm::normalize(vector3(a_pOther->GetMaxGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal());
+	//vector3 v3By = glm::normalize(vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMaxGlobal().y, a_pOther->GetMinGlobal().z) - a_pOther->GetMinGlobal());
+	//vector3 v3Bz = glm::normalize(vector3(a_pOther->GetMinGlobal().x, a_pOther->GetMinGlobal().y, a_pOther->GetMaxGlobal().z) - a_pOther->GetMinGlobal());
 
-	//cross product axes
-	vector3 v3AxCrossBx = glm::normalize(glm::cross(v3Ax, v3Bx));
-	vector3 v3AxCrossBy = glm::normalize(glm::cross(v3Ax, v3By));
-	vector3 v3AxCrossBz = glm::normalize(glm::cross(v3Ax, v3Bz));
-	vector3 v3AyCrossBx = glm::normalize(glm::cross(v3Ay, v3Bx));
-	vector3 v3AyCrossBy = glm::normalize(glm::cross(v3Ay, v3By));
-	vector3 v3AyCrossBz = glm::normalize(glm::cross(v3Ay, v3Bz));
-	vector3 v3AzCrossBx = glm::normalize(glm::cross(v3Az, v3Bx));
-	vector3 v3AzCrossBy = glm::normalize(glm::cross(v3Az, v3By));
-	vector3 v3AzCrossBz = glm::normalize(glm::cross(v3Az, v3Bz));
+	////cross product axes
+	//vector3 v3AxCrossBx = glm::normalize(glm::cross(v3Ax, v3Bx));
+	//vector3 v3AxCrossBy = glm::normalize(glm::cross(v3Ax, v3By));
+	//vector3 v3AxCrossBz = glm::normalize(glm::cross(v3Ax, v3Bz));
+	//vector3 v3AyCrossBx = glm::normalize(glm::cross(v3Ay, v3Bx));
+	//vector3 v3AyCrossBy = glm::normalize(glm::cross(v3Ay, v3By));
+	//vector3 v3AyCrossBz = glm::normalize(glm::cross(v3Ay, v3Bz));
+	//vector3 v3AzCrossBx = glm::normalize(glm::cross(v3Az, v3Bx));
+	//vector3 v3AzCrossBy = glm::normalize(glm::cross(v3Az, v3By));
+	//vector3 v3AzCrossBz = glm::normalize(glm::cross(v3Az, v3Bz));
 
-	//add all of those to the list
-	axes.push_back(v3Ax);
-	axes.push_back(v3Ay);
-	axes.push_back(v3Az);
-	axes.push_back(v3Bx);
-	axes.push_back(v3By);
-	axes.push_back(v3Bz);
-	//check the cross products and make sure none of them are the 0 vector
-	if(v3AxCrossBx != vector3())
-		axes.push_back(v3AxCrossBx);
-	if (v3AxCrossBy != vector3())
-		axes.push_back(v3AxCrossBy);
-	if (v3AxCrossBz != vector3())
-		axes.push_back(v3AxCrossBz);
-	if (v3AyCrossBx != vector3())
-		axes.push_back(v3AyCrossBx);
-	if (v3AyCrossBy != vector3())
-		axes.push_back(v3AyCrossBy);
-	if (v3AyCrossBz != vector3())
-		axes.push_back(v3AyCrossBz);
-	if (v3AzCrossBx != vector3())
-		axes.push_back(v3AzCrossBx);
-	if (v3AzCrossBy != vector3())
-		axes.push_back(v3AzCrossBy);
-	if (v3AzCrossBz != vector3())
-		axes.push_back(v3AzCrossBz);
+	////add all of those to the list
+	//axes.push_back(v3Ax);
+	//axes.push_back(v3Ay);
+	//axes.push_back(v3Az);
+	//axes.push_back(v3Bx);
+	//axes.push_back(v3By);
+	//axes.push_back(v3Bz);
+	////check the cross products and make sure none of them are the 0 vector
+	//if(v3AxCrossBx != vector3())
+	//	axes.push_back(v3AxCrossBx);
+	//if (v3AxCrossBy != vector3())
+	//	axes.push_back(v3AxCrossBy);
+	//if (v3AxCrossBz != vector3())
+	//	axes.push_back(v3AxCrossBz);
+	//if (v3AyCrossBx != vector3())
+	//	axes.push_back(v3AyCrossBx);
+	//if (v3AyCrossBy != vector3())
+	//	axes.push_back(v3AyCrossBy);
+	//if (v3AyCrossBz != vector3())
+	//	axes.push_back(v3AyCrossBz);
+	//if (v3AzCrossBx != vector3())
+	//	axes.push_back(v3AzCrossBx);
+	//if (v3AzCrossBy != vector3())
+	//	axes.push_back(v3AzCrossBy);
+	//if (v3AzCrossBz != vector3())
+	//	axes.push_back(v3AzCrossBz);
 
-	vector3 v3CenterToCenter = GetCenterGlobal() - a_pOther->GetCenterGlobal();
+	//vector3 v3CenterToCenter = GetCenterGlobal() - a_pOther->GetCenterGlobal();
 
-	//test for collision by projecting half-widths onto each axis and comparing their total lengths against the distance between the centers of the objects (also projected on to the axes)
-	for (vector3 axis : axes)
-	{
-		float f_AProjectedHalfWidth = std::abs(glm::dot(GetHalfWidth(), axis));
-		float f_BProjectedHalfWidth = std::abs(glm::dot(a_pOther->GetHalfWidth(), axis));
-		float f_ProjectedCenterToCenterDistance = std::abs(glm::dot(v3CenterToCenter, axis)); //get the projected length
-		//if the distance from center to center is greater than the two widths put together, then there is space between the two objects
-		if (f_ProjectedCenterToCenterDistance > f_AProjectedHalfWidth + f_BProjectedHalfWidth)
-			return 1;
+	////test for collision by projecting half-widths onto each axis and comparing their total lengths against the distance between the centers of the objects (also projected on to the axes)
+	//for (vector3 axis : axes)
+	//{
+	//	float f_AProjectedHalfWidth = std::abs(glm::dot(GetHalfWidth(), axis));
+	//	float f_BProjectedHalfWidth = std::abs(glm::dot(a_pOther->GetHalfWidth(), axis));
+	//	float f_ProjectedCenterToCenterDistance = std::abs(glm::dot(v3CenterToCenter, axis)); //get the projected length
+	//	//if the distance from center to center is greater than the two widths put together, then there is space between the two objects
+	//	if (f_ProjectedCenterToCenterDistance > f_AProjectedHalfWidth + f_BProjectedHalfWidth)
+	//		return 1;
+	//}
+
+	////there is no axis test that separates this two objects
+	//return eSATResults::SAT_NONE;
+
+	//solution from the book
+	vector3 v3CenterG_A = GetCenterGlobal();
+	vector3 v3HalfWidthA = GetHalfWidth();
+	vector3 v3RotAxis_A[3];
+	v3RotAxis_A[0] = m_m4ToWorld[0];
+	v3RotAxis_A[1] = m_m4ToWorld[1];
+	v3RotAxis_A[2] = m_m4ToWorld[2];
+	matrix3 m3RotAxis_A = static_cast<matrix3>(m_m4ToWorld);
+	m3RotAxis_A[0] = v3RotAxis_A[0];
+	m3RotAxis_A[1] = v3RotAxis_A[1];
+	m3RotAxis_A[2] = v3RotAxis_A[2];
+	matrix3 m3RotAxisInverse_A = glm::inverse(m3RotAxis_A);
+
+	vector3 v3CenterG_B = a_pOther->GetCenterGlobal();
+	vector3 v3HalfWidthB = a_pOther->GetHalfWidth();
+	vector3 v3RotAxis_B[3];
+	v3RotAxis_B[0] = a_pOther->m_m4ToWorld[0];
+	v3RotAxis_B[1] = a_pOther->m_m4ToWorld[1];
+	v3RotAxis_B[2] = a_pOther->m_m4ToWorld[2];
+	matrix3 m3RotAxis_B = static_cast<matrix3>(a_pOther->m_m4ToWorld);
+	m3RotAxis_B[0] = v3RotAxis_B[0];
+	m3RotAxis_B[1] = v3RotAxis_B[1];
+	m3RotAxis_B[2] = v3RotAxis_B[2];
+	matrix3 m3RotAxisInverse_B = glm::inverse(m3RotAxis_B);
+
+	float ra, rb;
+	matrix3 R, AbsR;
+
+	//// Compute rotation matrix expressing b in a's coordinate frame
+	//for (int i = 0; i < 3; i++)
+	//	for (int j = 0; j < 3; j++)
+	//		R[i][j] = glm::dot(v3RotAxis_A[i], v3RotAxis_B[j]);
+	R = m3RotAxisInverse_B * m3RotAxis_A;
+
+	// Compute translation vector t
+	vector3 t = v3CenterG_B - v3CenterG_A;
+	// Bring translation into a's coordinate frame
+	//t = vector3(glm::dot(t, v3RotAxis_A[0]), glm::dot(t, v3RotAxis_A[1]), glm::dot(t, v3RotAxis_A[2]));
+	t = m3RotAxisInverse_A * vector4(t, 0.0f);
+
+	// Compute common subexpressions. Add in an epsilon term to
+	// counteract arithmetic errors when two edges are parallel and
+	// their cross product is (near) null (see text for details)
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 3; j++)
+			AbsR[i][j] = std::abs(R[i][j]) + 0.00000001f;
+
+	// Test axes L = A0, L = A1, L = A2
+	for (int i = 0; i < 3; i++) {
+		ra = v3HalfWidthA[i];
+		rb = v3HalfWidthB[0] * AbsR[i][0] + v3HalfWidthB[1] * AbsR[i][1] + v3HalfWidthB[2] * AbsR[i][2];
+		if (std::abs(t[i]) > ra + rb) return 1;
 	}
 
-	//there is no axis test that separates this two objects
-	return eSATResults::SAT_NONE;
+	// Test axes L = B0, L = B1, L = B2
+	for (int i = 0; i < 3; i++) {
+		ra = v3HalfWidthA[0] * AbsR[0][i] + v3HalfWidthA[1] * AbsR[1][i] + v3HalfWidthA[2] * AbsR[2][i];
+		rb = v3HalfWidthB[i];
+		if (std::abs(t[0] * R[0][i] + t[1] * R[1][i] + t[2] * R[2][i]) > ra + rb) return 1;
+	}
+
+	// Test axis L = A0 x B0
+	ra = v3HalfWidthA[1] * AbsR[2][0] + v3HalfWidthA[2] * AbsR[1][0];
+	rb = v3HalfWidthB[1] * AbsR[0][2] + v3HalfWidthB[2] * AbsR[0][1];
+	if (std::abs(t[2] * R[1][0] - t[1] * R[2][0]) > ra + rb) return 1;
+
+	// Test axis L = A0 x B1
+	ra = v3HalfWidthA[1] * AbsR[2][1] + v3HalfWidthA[2] * AbsR[1][1];
+	rb = v3HalfWidthB[0] * AbsR[0][2] + v3HalfWidthB[2] * AbsR[0][0];
+	if (std::abs(t[2] * R[1][1] - t[1] * R[2][1]) > ra + rb) return 1;
+
+	// Test axis L = A0 x B2
+	ra = v3HalfWidthA[1] * AbsR[2][2] + v3HalfWidthA[2] * AbsR[1][2];
+	rb = v3HalfWidthB[0] * AbsR[0][1] + v3HalfWidthB[1] * AbsR[0][0];
+	if (std::abs(t[2] * R[1][2] - t[1] * R[2][2]) > ra + rb) return 1;
+
+	// Test axis L = A1 x B0
+	ra = v3HalfWidthA[0] * AbsR[2][0] + v3HalfWidthA[2] * AbsR[0][0];
+	rb = v3HalfWidthB[1] * AbsR[1][2] + v3HalfWidthB[2] * AbsR[1][1];
+
+	if (std::abs(t[0] * R[2][0] - t[2] * R[0][0]) > ra + rb) return 1;
+
+	// Test axis L = A1 x B1
+	ra = v3HalfWidthA[0] * AbsR[2][1] + v3HalfWidthA[2] * AbsR[0][1];
+	rb = v3HalfWidthB[0] * AbsR[1][2] + v3HalfWidthB[2] * AbsR[1][0];
+	if (std::abs(t[0] * R[2][1] - t[2] * R[0][1]) > ra + rb) return 1;
+
+	// Test axis L = A1 x B2
+	ra = v3HalfWidthA[0] * AbsR[2][2] + v3HalfWidthA[2] * AbsR[0][2];
+	rb = v3HalfWidthB[0] * AbsR[1][1] + v3HalfWidthB[1] * AbsR[1][0];
+	if (std::abs(t[0] * R[2][2] - t[2] * R[0][2]) > ra + rb) return 1;
+
+	// Test axis L = A2 x B0
+	ra = v3HalfWidthA[0] * AbsR[1][0] + v3HalfWidthA[1] * AbsR[0][0];
+	rb = v3HalfWidthB[1] * AbsR[2][2] + v3HalfWidthB[2] * AbsR[2][1];
+	if (std::abs(t[1] * R[0][0] - t[0] * R[1][0]) > ra + rb) return 1;
+
+	// Test axis L = A2 x B1
+	ra = v3HalfWidthA[0] * AbsR[1][1] + v3HalfWidthA[1] * AbsR[0][1];
+	rb = v3HalfWidthB[0] * AbsR[2][2] + v3HalfWidthB[2] * AbsR[2][0];
+	if (std::abs(t[1] * R[0][1] - t[0] * R[1][1]) > ra + rb) return 1;
+
+	// Test axis L = A2 x B2
+	ra = v3HalfWidthA[0] * AbsR[1][2] + v3HalfWidthA[1] * AbsR[0][2];
+	rb = v3HalfWidthB[0] * AbsR[2][1] + v3HalfWidthB[1] * AbsR[2][0];
+	if (std::abs(t[1] * R[0][2] - t[0] * R[1][2]) > ra + rb) return 1;
+
+	// Since no separating axis is found, the OBBs must be intersecting
+	return 0;
 }
