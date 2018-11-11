@@ -11,6 +11,7 @@ namespace Simplex
 
 		typedef MyEntity* PEntity; //MyEntity Pointer
 		PEntity* m_mEntityArray = nullptr; //array of MyEntity pointers
+		uint numEntities = 0; //number of entities within this node specifically
 
 		vector3 centerPoint = vector3(); //center point of the octant
 		vector3 minPoint = vector3(); //center point of the octant
@@ -18,9 +19,14 @@ namespace Simplex
 
 		typedef MyOctant* OctantPointer; //MyOctant Pointer
 		OctantPointer children[8] = {}; //array of child octant pointers
+		bool hasChildren = false; //bool denoting whether or not a node has children
 
 		MyOctant();
+		MyOctant(vector3 minP, vector3 maxP);
 		~MyOctant();
 
+		void AddEntity(MyEntity* entity);
+
+		bool ShareOctant(MyEntity* ent1, MyEntity* ent2); //check if the two passed entities exist in this octant
 	};
 }

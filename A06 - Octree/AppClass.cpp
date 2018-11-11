@@ -30,7 +30,6 @@ void Application::InitVariables(void)
 		}
 	}
 	m_uOctantLevels = 1;
-	m_pEntityMngr->Update();
 	/*
 	- make a tree where if a node (box) has children (sub-boxes), it has 8 children (1 for each +/-x, +/-y, & +/-z octant space)
 	- perhaps have each node store its min and max global values for reference when inserting/checking for objects
@@ -41,6 +40,36 @@ void Application::InitVariables(void)
 	- to check to see if two objects are in the same leaf/octant, simply check all the leaves for both of them (i.e. do a for loop *in each leaf* looking for first object, then if you find that one then for loop again looking for the second one)
 	- tree insertion: check to see if any leaf has more than a specified # of objects in it, if it does, create the 8 children (regenerating the tree in the process(how?))
 	*/
+	//find the upper and lower bounds of the space taken up by objects in this scene
+	vector3 rootMin = vector3();
+	vector3 rootMax = vector3();
+	//get the initial values for absolute mins and maxes of the objects
+	for (size_t i = 0; i < m_pEntityMngr->GetEntityCount(); i++)
+	{
+		if (rootMax.x < m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().x) rootMax.x = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().x;
+		else if (rootMin.x > m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().x) rootMin.x = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().x;
+
+		if (rootMax.y < m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().y) rootMax.y = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().y;
+		else if (rootMin.y > m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().y) rootMin.y = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().y;
+
+		if (rootMax.z < m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().z) rootMax.z = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().z;
+		else if (rootMin.z > m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().z) rootMin.z = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().z;
+	}
+
+	//make the root octant square by equalizing the mins and maxes
+	if (std::abs(rootMin.x) > rootMax.x) rootMax.x = std::abs(rootMin.x);
+	else rootMin.x = -rootMax.x;
+	if (std::abs(rootMin.y) > rootMax.y) rootMax.y = std::abs(rootMin.y);
+	else rootMin.y = -rootMax.y;
+	if (std::abs(rootMin.z) > rootMax.z) rootMax.z = std::abs(rootMin.z);
+	else rootMin.z = -rootMax.z;
+
+	//set the root octant node based on the min and max calculated above
+	root = MyOctant(rootMin, rootMax);
+
+	//set the oct tree with the root and entity manager that have been initialized
+	mainTree = MyOctTree(&root, m_pEntityMngr);
+	m_pEntityMngr->Update(mainTree);
 }
 void Application::Update(void)
 {
@@ -54,7 +83,7 @@ void Application::Update(void)
 	CameraRotation();
 	
 	//Update Entity Manager
-	m_pEntityMngr->Update();
+	m_pEntityMngr->Update(mainTree);
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);

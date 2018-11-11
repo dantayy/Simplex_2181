@@ -6,16 +6,27 @@ namespace Simplex
 {
 	class MyOctTree
 	{
-		MyOctant root; //root of the Octree
-		MyEntityManager manager; //entity manager to refer to when trying to locate objects within octants within this tree
 
 	public:
+		MyOctant* root; //root of the Octree
+		MyEntityManager* manager; //entity manager to refer to when trying to locate objects within octants within this tree
+		uint idealEntityNum = 5; //ideal number of entities to be had within a leaf
+
+		//default constructor
 		MyOctTree();
+		//parameterized constructor
+		MyOctTree(MyOctant* sourceRoot, MyEntityManager* sourceManager);
+		//destructor
 		~MyOctTree();
 
-		//traversal method
 		//insertion method
+		void Insert(MyOctant* node);
+		//deletion method (deleting leaves from lowest level of tree)
+		void Delete(MyOctant* node);
 		//add objects method
+		void AddObjs(MyOctant* node);
+		//check for shared octancy method
+		bool ShareLeaf(MyEntity* ent1, MyEntity* ent2, MyOctant* node);
 	};
 }
 
