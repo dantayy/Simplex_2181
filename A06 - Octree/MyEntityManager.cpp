@@ -165,7 +165,7 @@ Simplex::MyEntityManager::MyEntityManager(MyEntityManager const& a_pOther){ }
 Simplex::MyEntityManager& Simplex::MyEntityManager::operator=(MyEntityManager const& a_pOther) { return *this; }
 Simplex::MyEntityManager::~MyEntityManager(){Release();};
 // other methods
-void Simplex::MyEntityManager::Update(MyOctTree tree)
+void Simplex::MyEntityManager::Update()
 {
 	//Clear all collisions
 	for (uint i = 0; i < m_uEntityCount; i++)
@@ -176,12 +176,9 @@ void Simplex::MyEntityManager::Update(MyOctTree tree)
 	//check collisions
 	for (uint i = 0; i < m_uEntityCount - 1; i++)
 	{
-		for (uint j = i + 1; j < m_uEntityCount; j++)
+		for (size_t j = 0; j < m_uEntityCount - 1; j++)
 		{
-			if (tree.ShareLeaf(m_mEntityArray[i], m_mEntityArray[j], tree.root))
-			{
-				m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
-			}
+			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
 		}
 	}
 }

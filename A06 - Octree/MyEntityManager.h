@@ -6,7 +6,6 @@ Date: 2017/07
 #define __MYENTITYMANAGER_H_
 
 #include "MyEntity.h"
-#include "MyOctTree.h"
 
 namespace Simplex
 {
@@ -74,7 +73,7 @@ public:
 	ARGUMENTS: OctTree used to mitigate unnecesary collision detection
 	OUTPUT: ---
 	*/
-	void Update(MyOctTree tree);
+	void Update();
 	/*
 	USAGE: Gets the model associated with this entity
 	ARGUMENTS: uint a_uIndex = -1 -> index in the list of entities; if less than 0 it will add it to the last in the list
