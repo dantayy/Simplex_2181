@@ -27,6 +27,6 @@ namespace Simplex
 
 		void AddEntity(MyEntity* entity);
 
-		bool IsColliding(MyEntity* ent); //check if the two passed entities exist in this octant
+		void IsColliding(); //check collisions between objects in the octant
 	};
 }

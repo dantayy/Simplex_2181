@@ -176,7 +176,7 @@ void Simplex::MyEntityManager::Update()
 	//check collisions
 	for (uint i = 0; i < m_uEntityCount - 1; i++)
 	{
-		for (size_t j = 0; j < m_uEntityCount - 1; j++)
+		for (size_t j = 0; j < m_uEntityCount; j++)
 		{
 			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
 		}

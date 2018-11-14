@@ -51,18 +51,14 @@ void Simplex::MyOctant::AddEntity(MyEntity * entity)
 	}
 }
 
-bool Simplex::MyOctant::IsColliding(MyEntity * ent)
+void Simplex::MyOctant::IsColliding()
 {
-	//get their IDs to check
-	String ent1ID = ent->GetUniqueID();
-	//check all the entities within this octant against the one passed
-	for (size_t i = 0; i < numEntities; i++)
+	//check collisions
+	for (uint i = 0; i < numEntities - 1; i++)
 	{
-		if (ent->IsColliding(m_mEntityArray[i]))
+		for (uint j = i + 1; j < numEntities; j++)
 		{
-			return true;
+			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
 		}
 	}
-
-	return false;
 }

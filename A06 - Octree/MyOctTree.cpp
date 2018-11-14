@@ -132,12 +132,12 @@ void Simplex::MyOctTree::AddObjs(MyOctant* node)
 			//if a corner falls completely inside the leaf, then add the object to the leaf's array of entities and break so it doesn't get added multiple times
 			for (vector3 corner : corners)
 			{
-				if (object->GetRigidBody()->GetMinGlobal().x < current->minPoint.x &&
-					object->GetRigidBody()->GetMaxGlobal().x > current->maxPoint.x &&
-					object->GetRigidBody()->GetMinGlobal().y < current->minPoint.y &&
-					object->GetRigidBody()->GetMaxGlobal().y > current->maxPoint.y &&
-					object->GetRigidBody()->GetMinGlobal().z < current->minPoint.z &&
-					object->GetRigidBody()->GetMaxGlobal().z > current->maxPoint.z)
+				if (corner.x > current->minPoint.x &&
+					corner.y > current->minPoint.y &&
+					corner.z > current->minPoint.z &&
+					corner.x < current->maxPoint.x &&
+					corner.y < current->maxPoint.y &&
+					corner.z < current->maxPoint.z)
 				{
 					current->AddEntity(object);
 					break;
@@ -147,7 +147,7 @@ void Simplex::MyOctTree::AddObjs(MyOctant* node)
 	}
 }
 
-bool Simplex::MyOctTree::CollisionInLeaf(MyOctant * node, MyEntity* ent)
+void Simplex::MyOctTree::CollisionInLeaf(MyOctant * node)
 {
 	//node to analyze for shared entities
 	MyOctant* current = node;
@@ -157,12 +157,9 @@ bool Simplex::MyOctTree::CollisionInLeaf(MyOctant * node, MyEntity* ent)
 	{
 		for (MyOctant* child : current->children)
 		{
-			if (CollisionInLeaf(child, ent)) return true;
+			CollisionInLeaf(child);
 		}
 	}
 
-	//lowest level check for a shared leaf/octant, will be brought up the recursive function if true
-	if (current->IsColliding(ent)) return true;
-
-	return false;
+	current->IsColliding();
 }

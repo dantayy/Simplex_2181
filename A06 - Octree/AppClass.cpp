@@ -70,11 +70,8 @@ void Application::InitVariables(void)
 	//set the oct tree with the root and entity manager that have been initialized
 	mainTree = MyOctTree(&root, m_pEntityMngr);
 	mainTree.AddObjs(&root);
-	//check collisions
-	for (size_t i = 0; i < m_pEntityMngr->GetEntityCount(); i++)
-	{
-		mainTree.CollisionInLeaf(&root, m_pEntityMngr->GetEntity(i));
-	}
+	//Update Oct Tree
+	mainTree.CollisionInLeaf(&root);
 }
 void Application::Update(void)
 {
@@ -87,12 +84,8 @@ void Application::Update(void)
 	//Is the first person camera active?
 	CameraRotation();
 	
-	//Update Entity Manager
-	//check collisions
-	for (size_t i = 0; i < m_pEntityMngr->GetEntityCount(); i++)
-	{
-		mainTree.CollisionInLeaf(&root, m_pEntityMngr->GetEntity(i));
-	}
+	//Update Oct Tree
+	mainTree.CollisionInLeaf(&root);
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
