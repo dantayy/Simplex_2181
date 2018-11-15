@@ -134,6 +134,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 			mainTree.Insert(mainTree.root);
 			mainTree.AddObjs(mainTree.root);
+			m_uOctantLevels++;
 		}
 		break;
 	case sf::Keyboard::Subtract:
@@ -145,6 +146,7 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 			//m_pRoot = new MyOctant(m_uOctantLevels, 5);
 			mainTree.Delete(mainTree.root);
 			mainTree.AddObjs(mainTree.root);
+			m_uOctantLevels--;
 		}
 		break;
 	case sf::Keyboard::LShift:

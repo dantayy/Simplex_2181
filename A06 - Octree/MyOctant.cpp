@@ -14,6 +14,7 @@ Simplex::MyOctant::MyOctant(vector3 minP, vector3 maxP)
 	float halfLength = std::abs(maxP.z - minP.z);
 	float halfHeight = std::abs(maxP.y - minP.y);
 	centerPoint = vector3(minPoint.x + halfWidth, minPoint.y + halfHeight, minPoint.z + halfLength);
+	MeshManager::GetInstance()->AddWireCubeToRenderList(glm::translate(IDENTITY_M4, centerPoint) * glm::scale(vector3(halfWidth, 0.0f, 0.0f) * 2.0f), C_YELLOW);
 }
 
 
@@ -50,28 +51,14 @@ void Simplex::MyOctant::AddEntity(MyEntity * entity)
 	}
 }
 
-bool Simplex::MyOctant::ShareOctant(MyEntity * ent1, MyEntity * ent2)
+void Simplex::MyOctant::IsColliding()
 {
-	//get their IDs to check
-	String ent1ID = ent1->GetUniqueID();
-	String ent2ID = ent2->GetUniqueID();
-	//check all the entities within this octant to see if the two passed entities both exist within this one
-	bool ent1InThisLeaf = false;
-	bool ent2InThisLeaf = false;
-	for (size_t i = 0; i < numEntities; i++)
+	//check collisions
+	for (uint i = 0; i < numEntities - 1; i++)
 	{
-		if (m_mEntityArray[i]->GenUniqueID == ent1ID)
+		for (uint j = i + 1; j < numEntities; j++)
 		{
-			ent1InThisLeaf = true;
-		}
-		else if (m_mEntityArray[i]->GenUniqueID == ent2ID)
-		{
-			ent2InThisLeaf = true;
+			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
 		}
 	}
-
-	//if they both exist within this octant, return true
-	if (ent1InThisLeaf && ent2InThisLeaf) return true;
-
-	return false;
 }

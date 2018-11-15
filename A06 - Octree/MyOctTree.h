@@ -26,7 +26,7 @@ namespace Simplex
 		//add objects method
 		void AddObjs(MyOctant* node);
 		//check for shared octancy method
-		bool ShareLeaf(MyEntity* ent1, MyEntity* ent2, MyOctant* node);
+		void CollisionInLeaf(MyOctant* node);
 	};
 }
 
