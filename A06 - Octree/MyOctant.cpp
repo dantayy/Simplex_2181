@@ -1,64 +1,200 @@
 #include "MyOctant.h"
-
 using namespace Simplex;
+uint MyOctant::m_nCount = 0;
+//  MyOctant
+void MyOctant::Init(void)
+{
+	m_nData = 0;
+	m_pMeshMngr = MeshManager::GetInstance();
+	m_pEntityMngr = MyEntityManager::GetInstance();
+	for (uint i = 0; i < 8; i++)
+	{
+		m_pChild[i] = nullptr;
+	}
+}
 
 MyOctant::MyOctant()
 {
-}
-
-Simplex::MyOctant::MyOctant(vector3 minP, vector3 maxP)
-{
-	minPoint = minP;
-	maxPoint = maxP;
-	float halfWidth = std::abs(maxP.x - minP.x);
-	float halfLength = std::abs(maxP.z - minP.z);
-	float halfHeight = std::abs(maxP.y - minP.y);
-	centerPoint = vector3(minPoint.x + halfWidth, minPoint.y + halfHeight, minPoint.z + halfLength);
-	MeshManager::GetInstance()->AddWireCubeToRenderList(glm::translate(IDENTITY_M4, centerPoint) * glm::scale(vector3(halfWidth, 0.0f, 0.0f) * 2.0f), C_YELLOW);
-}
-
-
-MyOctant::~MyOctant()
-{
-}
-
-void Simplex::MyOctant::AddEntity(MyEntity * entity)
-{
-	//Create a temporal entity to store the object
-	MyEntity* pTemp = entity;
-	//if I was able to generate it add it to the list
-	if (pTemp->IsInitialized())
+	Init();
+	typedef MyEntity* PEntity; //MyEntity Pointer
+	PEntity* m_mEntityArray = m_pEntityMngr->m_mEntityArray; //array of MyEntity pointers
+	uint m_uEntityCount = m_pEntityMngr->m_uEntityCount; //number of elements in the array
+	std::vector<vector3> v3MaxMin_list;
+	for (uint i = 0; i < m_uEntityCount; ++i)
 	{
-		//create a new temp array with one extra entry
-		PEntity* tempArray = new PEntity[numEntities + 1];
-		//start from 0 to the current count
-		uint uCount = 0;
-		for (uint i = 0; i < numEntities; ++i)
+		MyRigidBody* pRG = m_mEntityArray[i]->GetRigidBody();
+		vector3 v3Min = pRG->GetMinGlobal();
+		vector3 v3Max = pRG->GetMaxGlobal();
+		v3MaxMin_list.push_back(v3Min);
+		v3MaxMin_list.push_back(v3Max);
+	}
+
+	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
+	m_pRigidBody->MakeCubic();
+	m_iID = m_nCount;
+	//determine whether or not this octant has the ideal # of entities within it while also setting the dimension for the entities within this octant to this octant's unique ID
+	idealAchieved = IsColliding();
+}
+
+MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
+{
+	Init();
+	std::vector<vector3> v3MaxMin_list;
+	v3MaxMin_list.push_back(a_v3Center - vector3(a_fSize));
+	v3MaxMin_list.push_back(a_v3Center + vector3(a_fSize));
+	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
+	m_nCount++;
+	m_iID = m_nCount;
+	//determine whether or not this octant has the ideal # of entities within it while also setting the dimension for the entities within this octant to this octant's unique ID
+	idealAchieved = IsColliding();
+}
+
+void MyOctant::Subdivide()
+{
+	//if this octant has achieved the ideal number of entities, do not perform this action
+	if (idealAchieved) return;
+
+	//if this octant has children, recursively subdivide the children instead
+	if (hasChildren)
+	{
+		for (MyOctant* child : m_pChild)
 		{
-			tempArray[uCount] = m_mEntityArray[i];
-			++uCount;
+			child->Subdivide();
 		}
-		tempArray[uCount] = pTemp;
-		//if there was an older array delete
-		if (m_mEntityArray)
+	}
+	else
+	{
+		vector3 v3Center = m_pRigidBody->GetCenterLocal();
+		vector3 v3HalfWidth = m_pRigidBody->GetHalfWidth();
+		float fSize = (v3HalfWidth.x) / 2.0f;
+		float fCenters = fSize;
+
+		//these need to be safedeleted at some point
+		m_pChild[0] = new MyOctant(v3Center + vector3(fCenters, fCenters, fCenters), fSize);
+		m_pChild[1] = new MyOctant(v3Center + vector3(-fCenters, fCenters, fCenters), fSize);
+		m_pChild[2] = new MyOctant(v3Center + vector3(-fCenters, -fCenters, fCenters), fSize);
+		m_pChild[3] = new MyOctant(v3Center + vector3(fCenters, -fCenters, fCenters), fSize);
+
+		m_pChild[4] = new MyOctant(v3Center + vector3(fCenters, fCenters, -fCenters), fSize);
+		m_pChild[5] = new MyOctant(v3Center + vector3(-fCenters, fCenters, -fCenters), fSize);
+		m_pChild[6] = new MyOctant(v3Center + vector3(-fCenters, -fCenters, -fCenters), fSize);
+		m_pChild[7] = new MyOctant(v3Center + vector3(fCenters, -fCenters, -fCenters), fSize);
+
+		for (uint i = 0; i < 8; i++)
 		{
-			delete[] m_mEntityArray;
+			m_pChild[i]->m_nLevel = m_nLevel + 1;
+			m_pChild[i]->m_pParent = this;
 		}
-		//make the member pointer the temp pointer
-		m_mEntityArray = tempArray;
-		//add one entity to the count
-		++numEntities;
+		hasChildren = true;
 	}
 }
 
-void Simplex::MyOctant::IsColliding()
+void Simplex::MyOctant::Undivide(void)
 {
-	//check collisions
-	for (uint i = 0; i < numEntities - 1; i++)
+	//check for children, if none then don't do anything
+	if (hasChildren)
 	{
-		for (uint j = i + 1; j < numEntities; j++)
+		//check all children to see if this current node has grandchildren
+		bool hasGrandchildren = false;
+		for (MyOctant* child : m_pChild)
 		{
-			m_mEntityArray[i]->IsColliding(m_mEntityArray[j]);
+			if (child->hasChildren)
+			{
+				hasGrandchildren = true;
+				break;
+			}
+		}
+		//if the current node has grandchildren, just recurse into each child
+		if (hasGrandchildren)
+		{
+			for (MyOctant* child : m_pChild)
+			{
+				child->Undivide();
+			}
+		}
+		else
+		{
+			//delete the children since none of them have children
+			for (uint i = 0; i < 8; i++)
+			{
+				SafeDelete(m_pChild[i]);
+			}
+			hasChildren = false;
+			//reset entities within this now undivided octant
+			idealAchieved = IsColliding();
 		}
 	}
 }
+
+void MyOctant::Swap(MyOctant& other)
+{
+	std::swap(m_nData, other.m_nData);
+	std::swap(m_lData, other.m_lData);
+}
+void MyOctant::Release(void)
+{
+	m_lData.clear();
+	SafeDelete(m_pRigidBody);
+}
+void Simplex::MyOctant::Display(void)
+{
+	m_pRigidBody->AddToRenderList();
+	for (uint i = 0; i < 8; i++)
+	{
+		if (m_pChild[i])
+			m_pChild[i]->Display();
+	}
+}
+bool Simplex::MyOctant::IsColliding(void)
+{
+	typedef MyEntity* PEntity; //MyEntity Pointer
+	PEntity* m_mEntityArray = m_pEntityMngr->m_mEntityArray; //array of MyEntity pointers
+	uint m_uEntityCount = m_pEntityMngr->m_uEntityCount; //number of elements in the array
+
+	uint numCollisions = 0; //number of octant/entity collisions
+	//go through the entity array and check for collisions against this octant's rigid body
+	for (uint i = 0; i < m_uEntityCount; ++i)
+	{
+		MyRigidBody* pRB = m_mEntityArray[i]->GetRigidBody();
+		//the entity exists within this octant, set its dimension to this octant's unique ID (for now)
+		if (pRB->IsColliding(m_pRigidBody))
+		{
+			m_mEntityArray[i]->AddDimension(m_iID);
+			numCollisions++;
+		}
+	}
+
+	//return true if the # of entities within this octant is less than or equal to the ideal
+	if (numCollisions <= idealNumEntities)
+		return true;
+	return false;
+}
+MyOctant::MyOctant(MyOctant const& other)
+{
+	m_nData = other.m_nData;
+	m_lData = other.m_lData;
+}
+MyOctant& MyOctant::operator=(MyOctant const& other)
+{
+	if (this != &other)
+	{
+		Release();
+		Init();
+		MyOctant temp(other);
+		Swap(temp);
+	}
+	return *this;
+}
+MyOctant::~MyOctant() { Release(); };
+//Accessors
+void MyOctant::SetData(int a_nData) { m_nData = a_nData; }
+int MyOctant::GetData(void) { return m_nData; }
+void MyOctant::SetDataOnVector(int a_nData) { m_lData.push_back(a_nData); }
+int& MyOctant::GetDataOnVector(int a_nIndex)
+{
+	int nIndex = static_cast<int>(m_lData.size());
+	assert(a_nIndex >= 0 && a_nIndex < nIndex);
+	return m_lData[a_nIndex];
+}
+//--- Non Standard Singleton Methods
+

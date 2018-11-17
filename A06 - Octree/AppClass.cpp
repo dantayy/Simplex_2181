@@ -40,38 +40,9 @@ void Application::InitVariables(void)
 	- to check to see if two objects are in the same leaf/octant, simply check all the leaves for both of them (i.e. do a for loop *in each leaf* looking for first object, then if you find that one then for loop again looking for the second one)
 	- tree insertion: check to see if any leaf has more than a specified # of objects in it, if it does, create the 8 children (regenerating the tree in the process(how?))
 	*/
-	//find the upper and lower bounds of the space taken up by objects in this scene
-	vector3 rootMin = vector3();
-	vector3 rootMax = vector3();
-	//get the initial values for absolute mins and maxes of the objects
-	for (size_t i = 0; i < m_pEntityMngr->GetEntityCount(); i++)
-	{
-		if (rootMax.x < m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().x) rootMax.x = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().x;
-		else if (rootMin.x > m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().x) rootMin.x = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().x;
 
-		if (rootMax.y < m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().y) rootMax.y = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().y;
-		else if (rootMin.y > m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().y) rootMin.y = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().y;
-
-		if (rootMax.z < m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().z) rootMax.z = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMaxGlobal().z;
-		else if (rootMin.z > m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().z) rootMin.z = m_pEntityMngr->GetEntity(i)->GetRigidBody()->GetMinGlobal().z;
-	}
-
-	//make the root octant square by equalizing the mins and maxes
-	if (std::abs(rootMin.x) > rootMax.x) rootMax.x = std::abs(rootMin.x);
-	else rootMin.x = -rootMax.x;
-	if (std::abs(rootMin.y) > rootMax.y) rootMax.y = std::abs(rootMin.y);
-	else rootMin.y = -rootMax.y;
-	if (std::abs(rootMin.z) > rootMax.z) rootMax.z = std::abs(rootMin.z);
-	else rootMin.z = -rootMax.z;
-
-	//set the root octant node based on the min and max calculated above
-	root = MyOctant(rootMin, rootMax);
-
-	//set the oct tree with the root and entity manager that have been initialized
-	mainTree = MyOctTree(&root, m_pEntityMngr);
-	mainTree.AddObjs(&root);
-	//Update Oct Tree
-	mainTree.CollisionInLeaf(&root);
+	//set up the root node
+	root = new MyOctant();
 }
 void Application::Update(void)
 {
@@ -81,11 +52,11 @@ void Application::Update(void)
 	//Is the ArcBall active?
 	ArcBall();
 
+	//update collisions
+	m_pEntityMngr->Update();
+
 	//Is the first person camera active?
 	CameraRotation();
-	
-	//Update Oct Tree
-	mainTree.CollisionInLeaf(&root);
 
 	//Add objects to render list
 	m_pEntityMngr->AddEntityToRenderList(-1, true);
@@ -96,20 +67,20 @@ void Application::Display(void)
 	ClearScreen();
 
 	//display octree
-	//m_pRoot->Display();
-	
+	root->Display();
+
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
-	
+
 	//render list call
 	m_uRenderCallCount = m_pMeshMngr->Render();
 
 	//clear the render list
 	m_pMeshMngr->ClearRenderList();
-	
+
 	//draw gui,
 	DrawGUI();
-	
+
 	//end the current frame (internally swaps the front and back buffers)
 	m_pWindow->display();
 }
@@ -117,4 +88,12 @@ void Application::Release(void)
 {
 	//release GUI
 	ShutdownGUI();
+
+	//delete the octants
+	while (m_uOctantLevels > 1)
+	{
+		root->Undivide();
+		m_uOctantLevels--;
+	}
+	SafeDelete(root);
 }
