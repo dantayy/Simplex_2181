@@ -117,7 +117,17 @@ void Simplex::MyOctant::Undivide(void)
 			//delete the children since none of them have children
 			for (uint i = 0; i < 8; i++)
 			{
+				//go through the entity array and check for collisions against this octant's rigid body to remove
+				for (uint j = 0; j < m_pEntityMngr->GetEntityCount(); ++j)
+				{
+					//the entity existed within this octant, remove it from the entity's array of octants
+					if (m_pEntityMngr->m_mEntityArray[j]->IsInDimension(m_pChild[i]->m_iID))
+					{
+						m_pEntityMngr->m_mEntityArray[j]->RemoveDimension(m_pChild[i]->m_iID);
+					}
+				}
 				SafeDelete(m_pChild[i]);
+				m_nCount--;
 			}
 			hasChildren = false;
 			//reset entities within this now undivided octant
@@ -151,23 +161,40 @@ bool Simplex::MyOctant::IsColliding(void)
 	PEntity* m_mEntityArray = m_pEntityMngr->m_mEntityArray; //array of MyEntity pointers
 	uint m_uEntityCount = m_pEntityMngr->m_uEntityCount; //number of elements in the array
 
-	uint numCollisions = 0; //number of octant/entity collisions
-	//go through the entity array and check for collisions against this octant's rigid body
-	for (uint i = 0; i < m_uEntityCount; ++i)
+	//if this octant has children, recursively check for collision with the children instead
+	if (hasChildren)
 	{
-		MyRigidBody* pRB = m_mEntityArray[i]->GetRigidBody();
-		//the entity exists within this octant, set its dimension to this octant's unique ID (for now)
-		if (pRB->IsColliding(m_pRigidBody))
+		//reset the dimension arrays for all the entities so that when they're checked for collision again they only have the leaf nodes in their arrays
+		for (uint i = 0; i < m_uEntityCount; ++i)
 		{
-			m_mEntityArray[i]->AddDimension(m_iID);
-			numCollisions++;
+			m_mEntityArray[i]->ClearDimensionSet();
 		}
+		for (MyOctant* child : m_pChild)
+		{
+			child->Subdivide();
+		}
+		return false; //this dimension clearly did not have the ideal number of entities since it has subdivisions
 	}
+	else
+	{
+		uint numCollisions = 0; //number of octant/entity collisions
+		//go through the entity array and check for collisions against this octant's rigid body
+		for (uint i = 0; i < m_uEntityCount; ++i)
+		{
+			MyRigidBody* pRB = m_mEntityArray[i]->GetRigidBody();
+			//the entity exists within this octant, add it to the entities array of octants it exists in
+			if (pRB->IsColliding(m_pRigidBody))
+			{
+				m_mEntityArray[i]->AddDimension(m_iID);
+				numCollisions++;
+			}
+		}
 
-	//return true if the # of entities within this octant is less than or equal to the ideal
-	if (numCollisions <= idealNumEntities)
-		return true;
-	return false;
+		//return true if the # of entities within this octant is less than or equal to the ideal
+		if (numCollisions <= idealNumEntities)
+			return true;
+		return false;
+	}
 }
 MyOctant::MyOctant(MyOctant const& other)
 {

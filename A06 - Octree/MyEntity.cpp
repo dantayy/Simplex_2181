@@ -242,7 +242,10 @@ bool Simplex::MyEntity::IsColliding(MyEntity* const other)
 	//if the entities are not living in the same dimension
 	//they are not colliding
 	if (!SharesDimension(other))
+	{
+		std::cout << "Not sharing a dimension" << std::endl;
 		return false;
+	}
 
 	return m_pRigidBody->IsColliding(other->GetRigidBody());
 }
