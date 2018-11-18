@@ -148,11 +148,14 @@ void MyOctant::Release(void)
 }
 void Simplex::MyOctant::Display(void)
 {
-	m_pRigidBody->AddToRenderList();
-	for (uint i = 0; i < 8; i++)
+	if (isVisible)
 	{
-		if (m_pChild[i])
-			m_pChild[i]->Display();
+		m_pRigidBody->AddToRenderList();
+		for (uint i = 0; i < 8; i++)
+		{
+			if (m_pChild[i])
+				m_pChild[i]->Display();
+		}
 	}
 }
 bool Simplex::MyOctant::IsColliding(void)

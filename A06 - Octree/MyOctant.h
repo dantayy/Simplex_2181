@@ -29,6 +29,8 @@ namespace Simplex
 		bool idealAchieved = false; //bool determining whether or not this octant has the ideal number of entities or less
 
 	public:
+		bool isVisible = true; //bool for determining if the wireframes of the octant should be shown
+
 		/*
 		USAGE: Displays the octant's rigid body
 		ARGUMENTS: ---
