@@ -26,10 +26,10 @@ namespace Simplex
 		bool hasChildren = false; //bool determining whether or not this octant has children
 		uint m_nLevel = 0; //level this octant is at
 		uint idealNumEntities = 5; //ideal number of entities to exist within this octant
-		bool idealAchieved = false; //bool determining whether or not this octant has the ideal number of entities or less
 
 	public:
 		bool isVisible = true; //bool for determining if the wireframes of the octant should be shown
+		bool idealAchieved = false; //bool determining whether or not this octant has the ideal number of entities or less
 
 		/*
 		USAGE: Displays the octant's rigid body
@@ -57,7 +57,7 @@ namespace Simplex
 		void Undivide(void);
 		/*
 		USAGE: Parameterized Constructor
-		ARGUMENTS: Center for the new octant, and size of the new octant
+		ARGUMENTS: Center for the new octant, size of the new octant
 		OUTPUT: ---
 		*/
 		MyOctant(vector3 a_v3Center, float a_fSize);

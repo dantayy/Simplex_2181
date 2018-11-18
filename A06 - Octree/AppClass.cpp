@@ -30,19 +30,10 @@ void Application::InitVariables(void)
 		}
 	}
 	m_uOctantLevels = 1;
-	/*
-	- make a tree where if a node (box) has children (sub-boxes), it has 8 children (1 for each +/-x, +/-y, & +/-z octant space)
-	- perhaps have each node store its min and max global values for reference when inserting/checking for objects
-	- only leaves in the tree should have objects assigned to them (perhaps generate the tree first then add the objects?)
-	- check for lack of children to determine leafhood by *traversing* the tree and whenever a node with no children is hit, add objects to its object array before stepping out
-	- to add an object to leaves, check each leaf cube space against the 8 corners of the object and if any of the corners are inside, add them to those leaves
-	- do this for every object in the scene
-	- to check to see if two objects are in the same leaf/octant, simply check all the leaves for both of them (i.e. do a for loop *in each leaf* looking for first object, then if you find that one then for loop again looking for the second one)
-	- tree insertion: check to see if any leaf has more than a specified # of objects in it, if it does, create the 8 children (regenerating the tree in the process(how?))
-	*/
 
-	//set up the root node
+	//set up the root node and do the first spatially optimized collision check setup
 	root = new MyOctant();
+	root->idealAchieved = root->IsColliding();
 }
 void Application::Update(void)
 {

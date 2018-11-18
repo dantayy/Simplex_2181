@@ -32,8 +32,6 @@ MyOctant::MyOctant()
 	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
 	m_pRigidBody->MakeCubic();
 	m_iID = m_nCount;
-	//determine whether or not this octant has the ideal # of entities within it while also setting the dimension for the entities within this octant to this octant's unique ID
-	idealAchieved = IsColliding();
 }
 
 MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
@@ -45,8 +43,6 @@ MyOctant::MyOctant(vector3 a_v3Center, float a_fSize)
 	m_pRigidBody = new MyRigidBody(v3MaxMin_list);
 	m_nCount++;
 	m_iID = m_nCount;
-	//determine whether or not this octant has the ideal # of entities within it while also setting the dimension for the entities within this octant to this octant's unique ID
-	idealAchieved = IsColliding();
 }
 
 void MyOctant::Subdivide()
@@ -117,21 +113,10 @@ void Simplex::MyOctant::Undivide(void)
 			//delete the children since none of them have children
 			for (uint i = 0; i < 8; i++)
 			{
-				//go through the entity array and check for collisions against this octant's rigid body to remove
-				for (uint j = 0; j < m_pEntityMngr->GetEntityCount(); ++j)
-				{
-					//the entity existed within this octant, remove it from the entity's array of octants
-					if (m_pEntityMngr->m_mEntityArray[j]->IsInDimension(m_pChild[i]->m_iID))
-					{
-						m_pEntityMngr->m_mEntityArray[j]->RemoveDimension(m_pChild[i]->m_iID);
-					}
-				}
 				SafeDelete(m_pChild[i]);
 				m_nCount--;
 			}
 			hasChildren = false;
-			//reset entities within this now undivided octant
-			idealAchieved = IsColliding();
 		}
 	}
 }
@@ -167,14 +152,9 @@ bool Simplex::MyOctant::IsColliding(void)
 	//if this octant has children, recursively check for collision with the children instead
 	if (hasChildren)
 	{
-		//reset the dimension arrays for all the entities so that when they're checked for collision again they only have the leaf nodes in their arrays
-		for (uint i = 0; i < m_uEntityCount; ++i)
-		{
-			m_mEntityArray[i]->ClearDimensionSet();
-		}
 		for (MyOctant* child : m_pChild)
 		{
-			child->Subdivide();
+			child->IsColliding();
 		}
 		return false; //this dimension clearly did not have the ideal number of entities since it has subdivisions
 	}

@@ -243,7 +243,6 @@ bool Simplex::MyEntity::IsColliding(MyEntity* const other)
 	//they are not colliding
 	if (!SharesDimension(other))
 	{
-		std::cout << "Not sharing a dimension" << std::endl;
 		return false;
 	}
 

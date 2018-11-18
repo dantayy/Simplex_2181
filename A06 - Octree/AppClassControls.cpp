@@ -129,22 +129,22 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 	case sf::Keyboard::Add:
 		if (m_uOctantLevels < 4)
 		{
-			//m_pEntityMngr->ClearDimensionSetAll();
-			++m_uOctantLevels;
-			//SafeDelete(m_pRoot);
-			//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+			//rebuild the spatially optimized collision checks
+			m_pEntityMngr->ClearDimensionSetAll();
 			root->Subdivide();
+			root->idealAchieved = root->IsColliding();
+			++m_uOctantLevels;
 		}
 		break;
 	case sf::Keyboard::M:
 	case sf::Keyboard::Subtract:
 		if (m_uOctantLevels > 1)
 		{
-			//m_pEntityMngr->ClearDimensionSetAll();
-			--m_uOctantLevels;
-			//SafeDelete(m_pRoot);
-			//m_pRoot = new MyOctant(m_uOctantLevels, 5);
+			//rebuild the spatially optimized collision checks
+			m_pEntityMngr->ClearDimensionSetAll();
 			root->Undivide();
+			root->idealAchieved = root->IsColliding();
+			--m_uOctantLevels;
 		}
 		break;
 	case sf::Keyboard::V:
